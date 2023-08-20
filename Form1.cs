@@ -26,12 +26,6 @@ namespace PSA_CVM2
         public string ARTIV = ">6B6:696";
         public string TELEMAT = ">764:664";
         public string COMBINE = ">75F:65F";
-        public string zoneZI = "F0FE";
-        public string zoneZA = "F080";
-        public string type;
-        public string zone;
-        public string answer;
-        public string typcvm;
 
         public Form1()
         {
@@ -396,26 +390,30 @@ namespace PSA_CVM2
         }
         private void buttonReadCodingCVM_Click(object sender, EventArgs e)
         {
-            string odebraneCodingCVM = serialData;
-            if (typcvm == "CVM_2")
-            {
+            //string odebraneCodingCVM = serialData;
+            //if (typcvm == "CVM_2")
+            //{
                 spArduino.WriteLine(String.Format("222100"));  //  wysyłamy polecenie CAN do odczytu strefy               
                 Thread.Sleep(1500);
-                odebraneCodingCVM = serialData;
-            }
-            if (typcvm == "CVM_3")
-            {
-                spArduino.WriteLine(String.Format("222101"));  //  wysyłamy polecenie CAN do odczytu strefy               
-                Thread.Sleep(1500);
-                odebraneCodingCVM = serialData;
-            }
-            richTextBoxLog.Text += odebraneCodingCVM + Environment.NewLine;
-            string toRemove3 = String.Format("62" + String.Format(zone));
-            string resultCodingCVM;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
-            int s2 = odebraneCodingCVM.IndexOf(toRemove3);                                          // Zapis string.Empty lub string = ""; to to samo
-            resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
+                string odebraneCodingCVM = serialData;
+                richTextBoxLog.Text += odebraneCodingCVM + Environment.NewLine;
+                string toRemove3 = String.Format("622100");
+                string resultCodingCVM;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
+                int s2 = odebraneCodingCVM.IndexOf(toRemove3);
+                resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
+            //}
+            //if (typcvm == "CVM_3")
+            //{
+            //    spArduino.WriteLine(String.Format("222101"));  //  wysyłamy polecenie CAN do odczytu strefy               
+            //    Thread.Sleep(1500);
+            //    odebraneCodingCVM = serialData;
+            //    richTextBoxLog.Text += odebraneCodingCVM + Environment.NewLine;
+            //    string toRemove3 = String.Format("622101");
+            //    string resultCodingCVM;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
+            //    int s2 = odebraneCodingCVM.IndexOf(toRemove3);
+            //    resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
+            //}
             textBoxCVMCoding.Text = resultCodingCVM;                                                     // wyświetlenie wartości kodowania w textbox
-            UnlockCodingCVM();
             spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
             Thread.Sleep(100);
         }
@@ -507,7 +505,7 @@ namespace PSA_CVM2
             else
             {
                 textBoxTypAAS.Text = typAAS;
-            UnlockCodingAAS();
+                UnlockCodingAAS();
             }
         }
         private void buttonReadCodingAAS_Click(object sender, EventArgs e)
@@ -521,7 +519,6 @@ namespace PSA_CVM2
             int s2 = odebraneCodingAAS.IndexOf(toRemove3);                                          // Zapis string.Empty lub string = ""; to to samo
             resultCodingAAS = odebraneCodingAAS.Remove(s2, toRemove3.Length);
             textBoxCodingAAS.Text = resultCodingAAS;                                                     // wyświetlenie wartości kodowania w textbox
-            UnlockCodingAAS();
         }
         private void buttonIdentifyARTIV_Click(object sender, EventArgs e)
         {
