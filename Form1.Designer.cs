@@ -359,7 +359,7 @@ namespace PSA_CVM2
             // 
             this.textBoxHWBSI.Location = new System.Drawing.Point(250, 57);
             this.textBoxHWBSI.Name = "textBoxHWBSI";
-            this.textBoxHWBSI.Size = new System.Drawing.Size(100, 22);
+            this.textBoxHWBSI.Size = new System.Drawing.Size(150, 22);
             this.textBoxHWBSI.TabIndex = 12;
             // 
             // label4
@@ -393,14 +393,14 @@ namespace PSA_CVM2
             // 
             this.textBoxSWBSI.Location = new System.Drawing.Point(250, 33);
             this.textBoxSWBSI.Name = "textBoxSWBSI";
-            this.textBoxSWBSI.Size = new System.Drawing.Size(100, 22);
+            this.textBoxSWBSI.Size = new System.Drawing.Size(150, 22);
             this.textBoxSWBSI.TabIndex = 8;
             // 
             // textBoxTypBSI
             // 
             this.textBoxTypBSI.Location = new System.Drawing.Point(250, 9);
             this.textBoxTypBSI.Name = "textBoxTypBSI";
-            this.textBoxTypBSI.Size = new System.Drawing.Size(100, 22);
+            this.textBoxTypBSI.Size = new System.Drawing.Size(150, 22);
             this.textBoxTypBSI.TabIndex = 7;
             // 
             // buttonIdentifyBSI
@@ -465,7 +465,7 @@ namespace PSA_CVM2
             // 
             this.textBoxHWCVM.Location = new System.Drawing.Point(250, 57);
             this.textBoxHWCVM.Name = "textBoxHWCVM";
-            this.textBoxHWCVM.Size = new System.Drawing.Size(100, 22);
+            this.textBoxHWCVM.Size = new System.Drawing.Size(150, 22);
             this.textBoxHWCVM.TabIndex = 18;
             // 
             // label7
@@ -499,14 +499,14 @@ namespace PSA_CVM2
             // 
             this.textBoxSWCVM.Location = new System.Drawing.Point(250, 33);
             this.textBoxSWCVM.Name = "textBoxSWCVM";
-            this.textBoxSWCVM.Size = new System.Drawing.Size(100, 22);
+            this.textBoxSWCVM.Size = new System.Drawing.Size(150, 22);
             this.textBoxSWCVM.TabIndex = 14;
             // 
             // textBoxTypCVM
             // 
             this.textBoxTypCVM.Location = new System.Drawing.Point(250, 9);
             this.textBoxTypCVM.Name = "textBoxTypCVM";
-            this.textBoxTypCVM.Size = new System.Drawing.Size(100, 22);
+            this.textBoxTypCVM.Size = new System.Drawing.Size(150, 22);
             this.textBoxTypCVM.TabIndex = 13;
             // 
             // buttonIdentifyCVM
@@ -572,7 +572,7 @@ namespace PSA_CVM2
             // 
             this.textBox1.Location = new System.Drawing.Point(250, 57);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 22);
+            this.textBox1.Size = new System.Drawing.Size(150, 22);
             this.textBox1.TabIndex = 24;
             // 
             // label10
@@ -606,14 +606,14 @@ namespace PSA_CVM2
             // 
             this.textBoxSWDAE.Location = new System.Drawing.Point(250, 33);
             this.textBoxSWDAE.Name = "textBoxSWDAE";
-            this.textBoxSWDAE.Size = new System.Drawing.Size(100, 22);
+            this.textBoxSWDAE.Size = new System.Drawing.Size(150, 22);
             this.textBoxSWDAE.TabIndex = 20;
             // 
             // textBox3
             // 
             this.textBox3.Location = new System.Drawing.Point(250, 9);
             this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(100, 22);
+            this.textBox3.Size = new System.Drawing.Size(150, 22);
             this.textBox3.TabIndex = 19;
             // 
             // buttonIdentifyDAE
@@ -679,7 +679,7 @@ namespace PSA_CVM2
             // 
             this.textBoxHWAAS.Location = new System.Drawing.Point(250, 57);
             this.textBoxHWAAS.Name = "textBoxHWAAS";
-            this.textBoxHWAAS.Size = new System.Drawing.Size(100, 22);
+            this.textBoxHWAAS.Size = new System.Drawing.Size(150, 22);
             this.textBoxHWAAS.TabIndex = 32;
             // 
             // label15
@@ -713,14 +713,14 @@ namespace PSA_CVM2
             // 
             this.textBoxSWAAS.Location = new System.Drawing.Point(250, 33);
             this.textBoxSWAAS.Name = "textBoxSWAAS";
-            this.textBoxSWAAS.Size = new System.Drawing.Size(100, 22);
+            this.textBoxSWAAS.Size = new System.Drawing.Size(150, 22);
             this.textBoxSWAAS.TabIndex = 28;
             // 
             // textBoxTypAAS
             // 
             this.textBoxTypAAS.Location = new System.Drawing.Point(250, 9);
             this.textBoxTypAAS.Name = "textBoxTypAAS";
-            this.textBoxTypAAS.Size = new System.Drawing.Size(100, 22);
+            this.textBoxTypAAS.Size = new System.Drawing.Size(150, 22);
             this.textBoxTypAAS.TabIndex = 27;
             // 
             // buttonIdentifyAAS
@@ -768,7 +768,7 @@ namespace PSA_CVM2
             // 
             this.textBoxHWARTIV.Location = new System.Drawing.Point(250, 57);
             this.textBoxHWARTIV.Name = "textBoxHWARTIV";
-            this.textBoxHWARTIV.Size = new System.Drawing.Size(100, 22);
+            this.textBoxHWARTIV.Size = new System.Drawing.Size(150, 22);
             this.textBoxHWARTIV.TabIndex = 42;
             // 
             // label18
@@ -802,14 +802,14 @@ namespace PSA_CVM2
             // 
             this.textBoxSWARTIV.Location = new System.Drawing.Point(250, 33);
             this.textBoxSWARTIV.Name = "textBoxSWARTIV";
-            this.textBoxSWARTIV.Size = new System.Drawing.Size(100, 22);
+            this.textBoxSWARTIV.Size = new System.Drawing.Size(150, 22);
             this.textBoxSWARTIV.TabIndex = 38;
             // 
             // textBoxTypARTIV
             // 
             this.textBoxTypARTIV.Location = new System.Drawing.Point(250, 9);
             this.textBoxTypARTIV.Name = "textBoxTypARTIV";
-            this.textBoxTypARTIV.Size = new System.Drawing.Size(100, 22);
+            this.textBoxTypARTIV.Size = new System.Drawing.Size(150, 22);
             this.textBoxTypARTIV.TabIndex = 37;
             // 
             // buttonReadCodingARTIV
@@ -861,7 +861,7 @@ namespace PSA_CVM2
             // 
             this.textBoxHWCOMBINE.Location = new System.Drawing.Point(250, 57);
             this.textBoxHWCOMBINE.Name = "textBoxHWCOMBINE";
-            this.textBoxHWCOMBINE.Size = new System.Drawing.Size(100, 22);
+            this.textBoxHWCOMBINE.Size = new System.Drawing.Size(150, 22);
             this.textBoxHWCOMBINE.TabIndex = 52;
             // 
             // label21
@@ -895,14 +895,14 @@ namespace PSA_CVM2
             // 
             this.textBoxSWCOMBINE.Location = new System.Drawing.Point(250, 33);
             this.textBoxSWCOMBINE.Name = "textBoxSWCOMBINE";
-            this.textBoxSWCOMBINE.Size = new System.Drawing.Size(100, 22);
+            this.textBoxSWCOMBINE.Size = new System.Drawing.Size(150, 22);
             this.textBoxSWCOMBINE.TabIndex = 48;
             // 
             // textBoxTypCOMBINE
             // 
             this.textBoxTypCOMBINE.Location = new System.Drawing.Point(250, 9);
             this.textBoxTypCOMBINE.Name = "textBoxTypCOMBINE";
-            this.textBoxTypCOMBINE.Size = new System.Drawing.Size(100, 22);
+            this.textBoxTypCOMBINE.Size = new System.Drawing.Size(150, 22);
             this.textBoxTypCOMBINE.TabIndex = 47;
             // 
             // buttonIdentifyCOMBINE
@@ -937,7 +937,7 @@ namespace PSA_CVM2
             // 
             this.textBoxHWTELEMAT.Location = new System.Drawing.Point(250, 57);
             this.textBoxHWTELEMAT.Name = "textBoxHWTELEMAT";
-            this.textBoxHWTELEMAT.Size = new System.Drawing.Size(100, 22);
+            this.textBoxHWTELEMAT.Size = new System.Drawing.Size(150, 22);
             this.textBoxHWTELEMAT.TabIndex = 52;
             // 
             // label24
@@ -971,14 +971,14 @@ namespace PSA_CVM2
             // 
             this.textBoxSWTELEMAT.Location = new System.Drawing.Point(250, 33);
             this.textBoxSWTELEMAT.Name = "textBoxSWTELEMAT";
-            this.textBoxSWTELEMAT.Size = new System.Drawing.Size(100, 22);
+            this.textBoxSWTELEMAT.Size = new System.Drawing.Size(150, 22);
             this.textBoxSWTELEMAT.TabIndex = 48;
             // 
             // textBoxTypTELEMAT
             // 
             this.textBoxTypTELEMAT.Location = new System.Drawing.Point(250, 9);
             this.textBoxTypTELEMAT.Name = "textBoxTypTELEMAT";
-            this.textBoxTypTELEMAT.Size = new System.Drawing.Size(100, 22);
+            this.textBoxTypTELEMAT.Size = new System.Drawing.Size(150, 22);
             this.textBoxTypTELEMAT.TabIndex = 47;
             // 
             // buttonIdentifyTELEMAT
