@@ -259,6 +259,12 @@ namespace PSA_CVM2
             odpowiedz = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString() + " < " + String.Format(odpowiedz) + Environment.NewLine;
         }
+        public void ReadZone(string zone,string odpowiedz)
+        {
+            spArduino.WriteLine("22" + zone);
+            Thread.Sleep(1500);
+            odpowiedz = serialData;
+        }
         private void buttonIdentifyBSI_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(BSI);
@@ -294,7 +300,6 @@ namespace PSA_CVM2
             else
                 {
                     textBoxTypBSI.Text = "Unknown " + typbsi;
-                    UnlockCodingBSI();
                 }
         }
         private void buttonReadCodingBSI_Click(object sender, EventArgs e)
@@ -322,7 +327,7 @@ namespace PSA_CVM2
 
             if (textBox2326Coding.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
             {
-                textBoxInfo.Text = "KODOWANIE ZONY NIE WYSTEPUJE W TYM BSI";
+                textBoxInfo.Text = "KODOWANIE STREFY NIE WYSTEPUJE W TYM BSI";
             }
             spArduino.WriteLine(String.Format("1003"));                     // Otwarcie sesji diagnostycznej
             richTextBoxLog.Text += String.Format("> 1003") + Environment.NewLine;
@@ -346,7 +351,7 @@ namespace PSA_CVM2
 
             if (textBox2373Coding.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
             {
-                textBoxInfo.Text = "KODOWANIE ZONY NIE WYSTEPUJE W TYM BSI";
+                textBoxInfo.Text = "KODOWANIE STREFY NIE WYSTEPUJE W TYM BSI";
             }
         }
         private void buttonIdentifyCVM_Click(object sender, EventArgs e)
@@ -385,7 +390,6 @@ namespace PSA_CVM2
             else
             {
                 textBoxTypCVM.Text = "Unknown " + typcvm;
-                UnlockCodingCVM();
             }
         }
         private void buttonReadCodingCVM_Click(object sender, EventArgs e)
@@ -505,7 +509,6 @@ namespace PSA_CVM2
             else
             {
                 textBoxTypAAS.Text = "Unknown " + typAAS;
-                UnlockCodingAAS();
             }
         }
         private void buttonReadCodingAAS_Click(object sender, EventArgs e)
@@ -551,7 +554,6 @@ namespace PSA_CVM2
             else
             {
                 textBoxTypARTIV.Text = "Unknown " + typartiv;
-                UnlockCodingARTIV();
             }  
         }
         private void buttonIdentifyCOMBINE_Click(object sender, EventArgs e)
