@@ -123,7 +123,7 @@ public class Program
         return result;
     }
 
-    public static void Main()
+    public static void Execute()
     {
         Console.WriteLine(getKey("11111111", "D91C"));
     }
