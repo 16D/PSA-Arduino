@@ -573,10 +573,10 @@ namespace PSA_CVM2
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypCOMBINE.Text = "CIROCCO";
             }
-            //else if (typcombine == "xxxx")
-            //{
-            //    textBoxTypCOMBINE.Text = "RADAR_AV_4";
-            //}
+            else if (typcombine == "26FC")
+            {
+                textBoxTypCOMBINE.Text = "COMBINE_UDS_EV";
+            }
             else
             {
                 textBoxTypCOMBINE.Text = "Unknown " + typcombine;
