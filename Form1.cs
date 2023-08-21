@@ -612,5 +612,12 @@ namespace PSA_CVM2
                 textBoxTypTELEMAT.Text = "Unknown " + typtelemat;
             }
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            getKey(textBoxSeed.Text,textBoxKey.Text);
+            string SeedKEY = result;
+            richTextBoxLog += result;
+        }
     }
 }

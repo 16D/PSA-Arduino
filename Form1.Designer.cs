@@ -120,6 +120,12 @@ namespace PSA_CVM2
             this.textBoxSWTELEMAT = new System.Windows.Forms.TextBox();
             this.textBoxTypTELEMAT = new System.Windows.Forms.TextBox();
             this.buttonIdentifyTELEMAT = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
+            this.textBoxSeed = new System.Windows.Forms.TextBox();
+            this.textBoxKey = new System.Windows.Forms.TextBox();
+            this.label27 = new System.Windows.Forms.Label();
+            this.label28 = new System.Windows.Forms.Label();
+            this.label29 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -133,6 +139,12 @@ namespace PSA_CVM2
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.label29);
+            this.panel1.Controls.Add(this.label28);
+            this.panel1.Controls.Add(this.label27);
+            this.panel1.Controls.Add(this.textBoxKey);
+            this.panel1.Controls.Add(this.textBoxSeed);
+            this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.buttonSearchCOM);
             this.panel1.Controls.Add(this.textBoxVin);
             this.panel1.Controls.Add(this.richTextBoxLog);
@@ -992,6 +1004,59 @@ namespace PSA_CVM2
             this.buttonIdentifyTELEMAT.UseVisualStyleBackColor = true;
             this.buttonIdentifyTELEMAT.Click += new System.EventHandler(this.buttonIdentifyTELEMAT_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(5, 68);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(104, 23);
+            this.button1.TabIndex = 10;
+            this.button1.Text = "Test algo";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // textBoxSeed
+            // 
+            this.textBoxSeed.Location = new System.Drawing.Point(131, 89);
+            this.textBoxSeed.Name = "textBoxSeed";
+            this.textBoxSeed.Size = new System.Drawing.Size(100, 22);
+            this.textBoxSeed.TabIndex = 11;
+            this.textBoxSeed.Text = "F0F07A5B";
+            // 
+            // textBoxKey
+            // 
+            this.textBoxKey.Location = new System.Drawing.Point(254, 89);
+            this.textBoxKey.Name = "textBoxKey";
+            this.textBoxKey.Size = new System.Drawing.Size(100, 22);
+            this.textBoxKey.TabIndex = 12;
+            this.textBoxKey.Text = "FAFA";
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(161, 71);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(44, 16);
+            this.label27.TabIndex = 13;
+            this.label27.Text = "SEED";
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(278, 70);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(33, 16);
+            this.label28.TabIndex = 14;
+            this.label28.Text = "KEY";
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(361, 74);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(144, 16);
+            this.label29.TabIndex = 15;
+            this.label29.Text = "odpowiedz 7DDC57DF";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -1114,6 +1179,12 @@ namespace PSA_CVM2
         private System.Windows.Forms.TextBox textBoxSWTELEMAT;
         private System.Windows.Forms.TextBox textBoxTypTELEMAT;
         private System.Windows.Forms.Button buttonIdentifyTELEMAT;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox textBoxSeed;
+        private System.Windows.Forms.TextBox textBoxKey;
+        private System.Windows.Forms.Label label28;
+        private System.Windows.Forms.Label label27;
+        private System.Windows.Forms.Label label29;
     }
 }
 
