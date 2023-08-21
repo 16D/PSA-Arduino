@@ -489,7 +489,7 @@ namespace PSA_CVM2
             string typAAS = odebraneAASZI.Substring(14, 4);                                           // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
             richTextBoxLog.Text += typAAS + Environment.NewLine;
             textBoxTypAAS.Text = typAAS;
-
+            //if (typAAS == "xxxx")
             //{
             //    textBoxTypAAS.Text = "AAS_UDS_G4";
             //    string CodingKeyAAS = "0000";
@@ -501,11 +501,12 @@ namespace PSA_CVM2
                 string CodingKeyAAS = "D1F5";
                 UnlockCodingAAS();
             }
-            //{
-            //    textBoxTypAAS.Text = "AAS_UDS_G6";
-            //    string CodingKeyAAS = "B6F0";
-            //    UnlockCodingAAS();
-            //}
+            if (typAAS == "06E0")
+            {
+                textBoxTypAAS.Text = "AAS_UDS_G6";
+                string CodingKeyAAS = "B6F0";
+                UnlockCodingAAS();
+            }
             else
             {
                 textBoxTypAAS.Text = "Unknown " + typAAS;
@@ -546,7 +547,7 @@ namespace PSA_CVM2
                 //string CodingKeyARTIV = "xxxx";
                 UnlockCodingARTIV();
             }
-            //else if (typartiv == "xxxx")
+            //if (typartiv == "0FE8")
             //{
             //    textBoxTypARTIV.Text = "RADAR_AV_4";
             //    UnlockCodingARTIV();
