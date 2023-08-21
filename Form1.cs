@@ -251,7 +251,7 @@ namespace PSA_CVM2
             richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 1001") + Environment.NewLine;
             Thread.Sleep(100);
             spArduino.WriteLine(String.Format(type));
-            //richTextBoxLog.Text += DateTime.Now.ToString() + " " + String.Format(type) + Environment.NewLine;
+            richTextBoxLog.Text += DateTime.Now.ToString() + " " + String.Format(type) + Environment.NewLine;
             Thread.Sleep(100);
             spArduino.WriteLine(String.Format("1003"));
             richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 1003") + Environment.NewLine;
@@ -272,7 +272,7 @@ namespace PSA_CVM2
             Thread.Sleep(1500);
             string odebraneBSIZI = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneBSIZI + Environment.NewLine;
-            spArduino.WriteLine(String.Format("22F080"));  //  wysyłamy polecenie CAN do odczytu strefy               
+            spArduino.WriteLine(String.Format("22F080"));
             Thread.Sleep(1500);
             string odebraneBSIZA = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneBSIZA + Environment.NewLine;
@@ -429,11 +429,16 @@ namespace PSA_CVM2
             Thread.Sleep(100);
             odpowiedz = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString() + " < " + String.Format(odpowiedz) + Environment.NewLine;
+            spArduino.WriteLine(String.Format("21FE"));
+            richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 21FE") + Environment.NewLine;
+            Thread.Sleep(100);
+            string odebraneDAEZI = serialData;
+            richTextBoxLog.Text += DateTime.Now.ToString() + " > " + odebraneDAEZI + Environment.NewLine;
             spArduino.WriteLine(String.Format("2180"));
             richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 2180") + Environment.NewLine;
             Thread.Sleep(100);
-            string odebraneDAE = serialData;                                
-            richTextBoxLog.Text += odebraneDAE + Environment.NewLine;
+            string odebraneDAEZA = serialData;                                
+            richTextBoxLog.Text += DateTime.Now.ToString() + " > " + odebraneDAEZA + Environment.NewLine;
 
             //Thread.Sleep(100);
             //string[] Ref = { odebrane7.Substring(48, 3), odebrane7.Substring(51, 3) };             // wydobycie z ciągu sekcji 2 x 3
