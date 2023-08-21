@@ -293,7 +293,7 @@ namespace PSA_CVM2
                 }
             else
                 {
-                    textBoxTypBSI.Text = typbsi;
+                    textBoxTypBSI.Text = "Unknown " + typbsi;
                     UnlockCodingBSI();
                 }
         }
@@ -384,7 +384,7 @@ namespace PSA_CVM2
             }
             else
             {
-                textBoxTypCVM.Text = typcvm;
+                textBoxTypCVM.Text = "Unknown " + typcvm;
                 UnlockCodingCVM();
             }
         }
@@ -504,7 +504,7 @@ namespace PSA_CVM2
             //}
             else
             {
-                textBoxTypAAS.Text = typAAS;
+                textBoxTypAAS.Text = "Unknown " + typAAS;
                 UnlockCodingAAS();
             }
         }
@@ -550,7 +550,7 @@ namespace PSA_CVM2
             //}
             else
             {
-                textBoxTypARTIV.Text = typartiv;
+                textBoxTypARTIV.Text = "Unknown " + typartiv;
                 UnlockCodingARTIV();
             }  
         }
@@ -581,7 +581,7 @@ namespace PSA_CVM2
             //}
             else
             {
-                textBoxTypCOMBINE.Text = typcombine;
+                textBoxTypCOMBINE.Text = "Unknown " + typcombine;
             }
         }
         private void buttonIdentifyTELEMAT_Click(object sender, EventArgs e)
@@ -611,7 +611,7 @@ namespace PSA_CVM2
             //}
             else
             {
-                textBoxTypTELEMAT.Text = typtelemat;
+                textBoxTypTELEMAT.Text = "Unknown " + typtelemat;
             }
         }
     }
