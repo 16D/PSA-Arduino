@@ -601,7 +601,7 @@ namespace PSA_CVM2
             textBoxTypTELEMAT.Text = typtelemat;
             if (typtelemat == "0DF5")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
-                textBoxTypTELEMAT.Text = "NAC";
+                textBoxTypTELEMAT.Text = "NAC/RCC";
             }
             //else if (typtelemat == "xxxx")
             //{
