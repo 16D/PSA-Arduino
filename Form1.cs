@@ -244,7 +244,7 @@ namespace PSA_CVM2
             buttonReadCodingARTIV.Enabled = false;
             buttonWriteCodingARTIV.Enabled = false;
         }
-        private void ConnectModuleUDS(string type)
+        public void ConnectModuleUDS(string type)
         {
             string odpowiedz = string.Empty;
             spArduino.WriteLine(String.Format("1001"));
