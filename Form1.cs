@@ -377,16 +377,11 @@ namespace PSA_CVM2
                 string CodingKeyCVM = "E2E5";
                 UnlockCodingCVM();
             }
-            else if (typcvm == "0774")
-            {
-                textBoxTypCVM.Text = "CVM_3";
-                UnlockCodingCVM();
-            }
-            else if (typcvm == "136A")
-            {
-                textBoxTypCVM.Text = "CVM_3";
-                UnlockCodingCVM();
-            }
+            //else if (typcvm == "0FD9")
+            //{
+            //    textBoxTypCVM.Text = "CVM_3";
+            //    UnlockCodingCVM();
+            //}
             else
             {
                 textBoxTypCVM.Text = "Unknown " + typcvm;
