@@ -107,7 +107,7 @@ namespace PSA_CVM2
         }
         private void buttonIdentifyVIN_Click(object sender, EventArgs e)
         {
-            textBoxInfo.Clear();
+            textBoxVin.Clear();
             spArduino.WriteLine(String.Format(BSI));
             richTextBoxLog.Text += DateTime.Now.ToString() + " " + String.Format(BSI) + Environment.NewLine;
             Thread.Sleep(10);
