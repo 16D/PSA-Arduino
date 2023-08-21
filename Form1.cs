@@ -439,12 +439,8 @@ namespace PSA_CVM2
             Thread.Sleep(100);
             string odebraneDAEZA = serialData;                                
             richTextBoxLog.Text += DateTime.Now.ToString() + " > " + odebraneDAEZA + Environment.NewLine;
-
-            //Thread.Sleep(100);
-            //string[] Ref = { odebrane7.Substring(48, 3), odebrane7.Substring(51, 3) };             // wydobycie z ciągu sekcji 2 x 3
-
-            //textBoxSWDAE.Text = "96." + Ref[0] + "." + Ref[1] + ".80";// + "." + odebrane4.Substring(8 - j, 3) + "." + odebrane4.Substring(11 - j, 3)+ "." + odebrane.Substring(14 - j, 2)     6
-            //Thread.Sleep(100);
+            string Ref = odebraneDAEZI.Substring(48, 6);
+            textBoxSWDAE.Text = "96" + Ref + "80";
             UnlockCodingDAE();
             //string KeyCodingDAE = 2305;
         }
