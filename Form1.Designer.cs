@@ -32,6 +32,7 @@ namespace PSA_CVM2
         {
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label29 = new System.Windows.Forms.Label();
             this.label28 = new System.Windows.Forms.Label();
             this.label27 = new System.Windows.Forms.Label();
             this.textBoxKey = new System.Windows.Forms.TextBox();
@@ -125,7 +126,6 @@ namespace PSA_CVM2
             this.textBoxSWTELEMAT = new System.Windows.Forms.TextBox();
             this.textBoxTypTELEMAT = new System.Windows.Forms.TextBox();
             this.buttonIdentifyTELEMAT = new System.Windows.Forms.Button();
-            this.label29 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -158,6 +158,15 @@ namespace PSA_CVM2
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(517, 466);
             this.panel1.TabIndex = 0;
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(349, 70);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(154, 16);
+            this.label29.TabIndex = 15;
+            this.label29.Text = "odpowiedź = 7DDC57DF";
             // 
             // label28
             // 
@@ -201,6 +210,7 @@ namespace PSA_CVM2
             this.button1.TabIndex = 10;
             this.button1.Text = "Test algo";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // buttonSearchCOM
             // 
@@ -1046,15 +1056,6 @@ namespace PSA_CVM2
             this.buttonIdentifyTELEMAT.Text = "Identify";
             this.buttonIdentifyTELEMAT.UseVisualStyleBackColor = true;
             this.buttonIdentifyTELEMAT.Click += new System.EventHandler(this.buttonIdentifyTELEMAT_Click);
-            // 
-            // label29
-            // 
-            this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(349, 70);
-            this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(154, 16);
-            this.label29.TabIndex = 15;
-            this.label29.Text = "odpowiedź = 7DDC57DF";
             // 
             // Form1
             // 

@@ -613,5 +613,11 @@ namespace PSA_CVM2
                 textBoxTypTELEMAT.Text = "Unknown " + typtelemat;
             }
         }
+
+        public void button1_Click(object sender, EventArgs e)
+        {
+            
+            Execute getKey(textBoxSeed.Text,textBoxKey.Text);
+        }
     }
 }
