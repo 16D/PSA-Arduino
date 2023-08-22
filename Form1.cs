@@ -26,6 +26,7 @@ namespace PSA_CVM2
         public string ARTIV = ">6B6:696";
         public string TELEMAT = ">764:664";
         public string COMBINE = ">75F:65F";
+        private string resultCodingCVM;
 
         public Form1()
         {
@@ -244,7 +245,7 @@ namespace PSA_CVM2
             buttonReadCodingARTIV.Enabled = false;
             buttonWriteCodingARTIV.Enabled = false;
         }
-        public void ConnectModuleUDS(string type)
+        private void ConnectModuleUDS(string type)
         {
             string odpowiedz = string.Empty;
             spArduino.WriteLine(String.Format("1001"));
@@ -354,7 +355,7 @@ namespace PSA_CVM2
                 textBoxInfo.Text = "KODOWANIE STREFY NIE WYSTEPUJE W TYM BSI";
             }
         }
-        private void buttonIdentifyCVM_Click(object sender, EventArgs e)
+        public void buttonIdentifyCVM_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(CVM);
             spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
@@ -368,20 +369,20 @@ namespace PSA_CVM2
             string Ref = odebraneCVMZI.Substring(48, 6);
             textBoxSWCVM.Text = "96" + Ref + "80";
             textBoxHWCVM.Text = odebraneCVMZA.Substring(20, 10);
-            string typcvm = odebraneCVMZI.Substring(14, 4);                                         // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
+            string typcvm = odebraneCVMZA.Substring(47, 3);                                         // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
             textBoxTypCVM.Text = typcvm;
 
-            if (typcvm == "0FD9")
+            if (typcvm == "199")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypCVM.Text = "CVM_2";
                 string CodingKeyCVM = "E2E5";
                 UnlockCodingCVM();
             }
-            //else if (typcvm == "0FD9")
-            //{
-            //    textBoxTypCVM.Text = "CVM_3";
-            //    UnlockCodingCVM();
-            //}
+            else if (typcvm == "179")
+            {
+                textBoxTypCVM.Text = "CVM_3";
+                UnlockCodingCVM();
+            }
             else
             {
                 textBoxTypCVM.Text = "Unknown " + typcvm;
@@ -390,8 +391,8 @@ namespace PSA_CVM2
         private void buttonReadCodingCVM_Click(object sender, EventArgs e)
         {
             //string odebraneCodingCVM = serialData;
-            //if (typcvm == "CVM_2")
-            //{
+            if (textBoxTypCVM.Text == "CVM_2")
+            {
                 spArduino.WriteLine(String.Format("222100"));  //  wysyłamy polecenie CAN do odczytu strefy               
                 Thread.Sleep(1500);
                 string odebraneCodingCVM = serialData;
@@ -400,18 +401,18 @@ namespace PSA_CVM2
                 string resultCodingCVM;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
                 int s2 = odebraneCodingCVM.IndexOf(toRemove3);
                 resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
-            //}
-            //if (typcvm == "CVM_3")
-            //{
-            //    spArduino.WriteLine(String.Format("222101"));  //  wysyłamy polecenie CAN do odczytu strefy               
-            //    Thread.Sleep(1500);
-            //    odebraneCodingCVM = serialData;
-            //    richTextBoxLog.Text += odebraneCodingCVM + Environment.NewLine;
-            //    string toRemove3 = String.Format("622101");
-            //    string resultCodingCVM;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
-            //    int s2 = odebraneCodingCVM.IndexOf(toRemove3);
-            //    resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
-            //}
+            }
+            if (textBoxTypCVM.Text == "CVM_3")
+            {
+                spArduino.WriteLine(String.Format("222101"));  //  wysyłamy polecenie CAN do odczytu strefy               
+                Thread.Sleep(1500);
+                string odebraneCodingCVM = serialData;
+                richTextBoxLog.Text += odebraneCodingCVM + Environment.NewLine;
+                string toRemove3 = String.Format("622101");
+                string resultCodingCVM;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
+                int s2 = odebraneCodingCVM.IndexOf(toRemove3);
+                resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
+            }
             textBoxCVMCoding.Text = resultCodingCVM;                                                     // wyświetlenie wartości kodowania w textbox
             spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
             Thread.Sleep(100);
@@ -531,23 +532,23 @@ namespace PSA_CVM2
             Thread.Sleep(1500);
             string odebraneARTIVZA = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneARTIVZA + Environment.NewLine;
-            string Ref = odebraneARTIVZI.Substring(48, 6);
+            string Ref = odebraneARTIVZA.Substring(48, 6);
             textBoxSWARTIV.Text = "96" + Ref + "80";
             textBoxHWARTIV.Text = odebraneARTIVZA.Substring(20, 10);
 
-            string typartiv = odebraneARTIVZI.Substring(14, 4);                                           // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
+            string typartiv = odebraneARTIVZI.Substring(47, 3);                                           // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
             textBoxTypARTIV.Text = typartiv;
-            if (typartiv == "0FE8")
+            if (typartiv == "FFF")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypARTIV.Text = "ARTIV_UDS";
                 //string CodingKeyARTIV = "xxxx";
                 UnlockCodingARTIV();
             }
-            //if (typartiv == "0FE8")
-            //{
-            //    textBoxTypARTIV.Text = "RADAR_AV_4";
-            //    UnlockCodingARTIV();
-            //}
+            if (typartiv == "153")
+            {
+                textBoxTypARTIV.Text = "RADAR_AV_4";
+                UnlockCodingARTIV();
+            }
             else
             {
                 textBoxTypARTIV.Text = "Unknown " + typartiv;
@@ -617,7 +618,6 @@ namespace PSA_CVM2
         public void button1_Click(object sender, EventArgs e)
         {
             
-            Execute getKey(textBoxSeed.Text,textBoxKey.Text);
         }
     }
 }

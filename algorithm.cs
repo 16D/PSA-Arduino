@@ -19,7 +19,7 @@ all copies or substantial portions of the Software.
 using System;
 namespace PSA_CVM2
 {
-    public partial class Program
+    public partial class Algorithm
     {
         public static string getKey(string seedTXT, string appKeyTXT)
         {
