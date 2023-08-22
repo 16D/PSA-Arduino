@@ -26,7 +26,7 @@ namespace PSA_CVM2
         public string ARTIV = ">6B6:696";
         public string TELEMAT = ">764:664";
         public string COMBINE = ">75F:65F";
-        private string resultCodingCVM;
+        public string resultCodingCVM;
 
         public Form1()
         {
