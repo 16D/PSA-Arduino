@@ -452,7 +452,7 @@ namespace PSA_CVM2
             Thread.Sleep(100);
             string odebraneDAEZA = serialData;                                
             richTextBoxLog.Text += DateTime.Now.ToString() + " > " + odebraneDAEZA + Environment.NewLine;
-            string Ref = odebraneDAEZI.Substring(48, 6);
+            string Ref = odebraneDAEZI.Substring(46, 6);
             textBoxSWDAE.Text = "96" + Ref + "80";
             UnlockCodingDAE();
             //string KeyCodingDAE = 2305;
