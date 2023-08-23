@@ -13,6 +13,9 @@ using System.Threading;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.Policy;
+using System.IO.Pipes;
+using System.Windows.Forms.VisualStyles;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace PSA_CVM2
 {
@@ -26,7 +29,7 @@ namespace PSA_CVM2
         public string ARTIV = ">6B6:696";
         public string TELEMAT = ">764:664";
         public string COMBINE = ">75F:65F";
-        private string resultCodingCVM;
+        public string resultCodingCVM;
 
         public Form1()
         {
@@ -43,7 +46,7 @@ namespace PSA_CVM2
                 comboBoxCOM.SelectedIndex = 0;
             }
         }
-        private void buttonSearchCOM_Click(object sender, EventArgs e)
+        private void ButtonSearchCOM_Click(object sender, EventArgs e)
         {
             comboBoxCOM.Items.Clear();
             String[] ports = SerialPort.GetPortNames();                                     //przypisanie aktywnego nr portu COM
@@ -57,7 +60,7 @@ namespace PSA_CVM2
                 comboBoxCOM.SelectedIndex = 0;
             }
         }
-        private void buttonStart_Click(object sender, EventArgs e)
+        private void ButtonStart_Click(object sender, EventArgs e)
         {
             if (comboBoxCOM.Text == string.Empty)
             {
@@ -78,7 +81,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + " Connected to Interface" + Environment.NewLine;
             }
         }
-        private void buttonStop_Click(object sender, EventArgs e)
+        private void ButtonStop_Click(object sender, EventArgs e)
         {
             spArduino.WriteLine(String.Format("82"));
             richTextBoxLog.Text += String.Format("> 82") + Environment.NewLine; 
@@ -98,15 +101,15 @@ namespace PSA_CVM2
             textBoxInfo.Text = "Disconnected";
             richTextBoxLog.Text += DateTime.Now.ToString() + " Disconnected" + Environment.NewLine;
         }
-        public void spArduino_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        public void SpArduino_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
             serialData = spArduino.ReadLine();
         }
-        private void buttonClearLog_Click(object sender, EventArgs e)
+        private void ButtonClearLog_Click(object sender, EventArgs e)
         {
             richTextBoxLog.Clear();
         }
-        private void buttonIdentifyVIN_Click(object sender, EventArgs e)
+        public void ButtonIdentifyVIN_Click(object sender, EventArgs e)
         {
             textBoxVin.Clear();
             spArduino.WriteLine(String.Format(BSI));
@@ -134,7 +137,7 @@ namespace PSA_CVM2
   
             }
         }
-        private void Vinbsi()
+        public void Vinbsi()
         {
             textBoxVin.Clear();
             string zone = "F190";
@@ -168,9 +171,20 @@ namespace PSA_CVM2
                     string stringValue = Char.ConvertFromUtf32(value);
                     char charValue = (char)value;
                     string VIN1 = charValue.ToString();
-
                     textBoxVin.AppendText(VIN1);
                     UnlockIdentification();
+                    var filename = "Log" + textBoxVin.Text + ".txt";
+                    var binPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
+                    var expectedDirectory = Path.Combine(binPath, "Logs");
+                        if (!Directory.Exists(expectedDirectory))
+                        {Directory.CreateDirectory(expectedDirectory);}
+                    var path = Path.Combine(expectedDirectory, filename);
+                    using (FileStream fileStream = File.Create(path))
+                    {
+                            var text = textBoxVin.Text;
+                            var content = Encoding.UTF8.GetBytes(text);
+                           fileStream.Write(content, 0, content.Length);
+                    }
                 }
         }
         private void LockIdentification()
@@ -266,7 +280,7 @@ namespace PSA_CVM2
             Thread.Sleep(1500);
             odpowiedz = serialData;
         }
-        private void buttonIdentifyBSI_Click(object sender, EventArgs e)
+        private void ButtonIdentifyBSI_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(BSI);
             spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
@@ -285,7 +299,7 @@ namespace PSA_CVM2
             if (typbsi == "13B3")
                 {                                              // warunek przypisania typu modułu do kodu Bajtowego
                     textBoxTypBSI.Text = "DELPHI";
-                    string CodingKeyBSI = "B4E0";
+//                    string CodingKeyBSI = "B4E0";
                     UnlockCodingBSI();
                 }
             else if (typbsi == "06B3")
@@ -303,7 +317,7 @@ namespace PSA_CVM2
                     textBoxTypBSI.Text = "Unknown " + typbsi;
                 }
         }
-        private void buttonReadCodingBSI_Click(object sender, EventArgs e)
+        private void ButtonReadCodingBSI_Click(object sender, EventArgs e)
         {
             spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
             richTextBoxLog.Text += String.Format("> 1003") + Environment.NewLine; 
@@ -355,7 +369,7 @@ namespace PSA_CVM2
                 textBoxInfo.Text = "KODOWANIE STREFY NIE WYSTEPUJE W TYM BSI";
             }
         }
-        public void buttonIdentifyCVM_Click(object sender, EventArgs e)
+        public void ButtonIdentifyCVM_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(CVM);
             spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
@@ -375,7 +389,7 @@ namespace PSA_CVM2
             if (typcvm == "199")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypCVM.Text = "CVM_2";
-                string CodingKeyCVM = "E2E5";
+//                string CodingKeyCVM = "E2E5";
                 UnlockCodingCVM();
             }
             else if (typcvm == "179")
@@ -388,7 +402,7 @@ namespace PSA_CVM2
                 textBoxTypCVM.Text = "Unknown " + typcvm;
             }
         }
-        private void buttonReadCodingCVM_Click(object sender, EventArgs e)
+        private void ButtonReadCodingCVM_Click(object sender, EventArgs e)
         {
             //string odebraneCodingCVM = serialData;
             if (textBoxTypCVM.Text == "CVM_2")
@@ -398,7 +412,6 @@ namespace PSA_CVM2
                 string odebraneCodingCVM = serialData;
                 richTextBoxLog.Text += odebraneCodingCVM + Environment.NewLine;
                 string toRemove3 = String.Format("622100");
-                string resultCodingCVM;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
                 int s2 = odebraneCodingCVM.IndexOf(toRemove3);
                 resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
             }
@@ -409,7 +422,6 @@ namespace PSA_CVM2
                 string odebraneCodingCVM = serialData;
                 richTextBoxLog.Text += odebraneCodingCVM + Environment.NewLine;
                 string toRemove3 = String.Format("622101");
-                string resultCodingCVM;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
                 int s2 = odebraneCodingCVM.IndexOf(toRemove3);
                 resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
             }
@@ -417,7 +429,7 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
             Thread.Sleep(100);
         }
-        private void buttonIdentifyDAE_Click(object sender, EventArgs e)
+        private void ButtonIdentifyDAE_Click(object sender, EventArgs e)
         {
             string odpowiedz = string.Empty; 
             spArduino.WriteLine(String.Format("1001"));
@@ -445,7 +457,7 @@ namespace PSA_CVM2
             UnlockCodingDAE();
             //string KeyCodingDAE = 2305;
         }
-        private void buttonReadCodingDAE_Click(object sender, EventArgs e)
+        private void ButtonReadCodingDAE_Click(object sender, EventArgs e)
         {
         
                 spArduino.WriteLine(String.Format("1001"));
@@ -467,7 +479,7 @@ namespace PSA_CVM2
             CodingDAE = odebrane8.Remove(s2, toRemove4.Length);
             textBoxDAECoding.Text = CodingDAE;
         }
-        private void buttonIdentifyAAS_Click(object sender, EventArgs e)
+        private void ButtonIdentifyAAS_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(AAS);
             spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
@@ -495,13 +507,13 @@ namespace PSA_CVM2
             if (typAAS == "03E1")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypAAS.Text = "AAS_UDS_G5";
-                string CodingKeyAAS = "D1F5";
+//                string CodingKeyAAS = "D1F5";
                 UnlockCodingAAS();
             }
             if (typAAS == "06E0")
             {
                 textBoxTypAAS.Text = "AAS_UDS_G6";
-                string CodingKeyAAS = "B6F0";
+ //               string CodingKeyAAS = "B6F0";
                 UnlockCodingAAS();
             }
             else
@@ -509,7 +521,7 @@ namespace PSA_CVM2
                 textBoxTypAAS.Text = "Unknown " + typAAS;
             }
         }
-        private void buttonReadCodingAAS_Click(object sender, EventArgs e)
+        private void ButtonReadCodingAAS_Click(object sender, EventArgs e)
         {
             spArduino.WriteLine(String.Format("222101"));  //  wysyłamy polecenie CAN do odczytu strefy               
             Thread.Sleep(1500);
@@ -521,7 +533,7 @@ namespace PSA_CVM2
             resultCodingAAS = odebraneCodingAAS.Remove(s2, toRemove3.Length);
             textBoxCodingAAS.Text = resultCodingAAS;                                                     // wyświetlenie wartości kodowania w textbox
         }
-        private void buttonIdentifyARTIV_Click(object sender, EventArgs e)
+        private void ButtonIdentifyARTIV_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(ARTIV);
             spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
@@ -532,11 +544,11 @@ namespace PSA_CVM2
             Thread.Sleep(1500);
             string odebraneARTIVZA = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneARTIVZA + Environment.NewLine;
-            string Ref = odebraneARTIVZA.Substring(48, 6);
+            string Ref = odebraneARTIVZI.Substring(48, 6);
             textBoxSWARTIV.Text = "96" + Ref + "80";
             textBoxHWARTIV.Text = odebraneARTIVZA.Substring(20, 10);
 
-            string typartiv = odebraneARTIVZI.Substring(47, 3);                                           // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
+            string typartiv = odebraneARTIVZA.Substring(47, 3);                                           // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
             textBoxTypARTIV.Text = typartiv;
             if (typartiv == "FFF")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
@@ -549,12 +561,12 @@ namespace PSA_CVM2
                 textBoxTypARTIV.Text = "RADAR_AV_4";
                 UnlockCodingARTIV();
             }
-            else
-            {
-                textBoxTypARTIV.Text = "Unknown " + typartiv;
-            }  
+            //else
+            //{
+            //    textBoxTypARTIV.Text = "Unknown " + typartiv;
+            //}  
         }
-        private void buttonIdentifyCOMBINE_Click(object sender, EventArgs e)
+        private void ButtonIdentifyCOMBINE_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(COMBINE);
             spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
@@ -584,7 +596,7 @@ namespace PSA_CVM2
                 textBoxTypCOMBINE.Text = "Unknown " + typcombine;
             }
         }
-        private void buttonIdentifyTELEMAT_Click(object sender, EventArgs e)
+        private void ButtonIdentifyTELEMAT_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(TELEMAT);
             spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
@@ -615,7 +627,7 @@ namespace PSA_CVM2
             }
         }
 
-        public void button1_Click(object sender, EventArgs e)
+        public void Button1_Click(object sender, EventArgs e)
         {
             
         }

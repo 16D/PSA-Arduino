@@ -210,7 +210,7 @@ namespace PSA_CVM2
             this.button1.TabIndex = 10;
             this.button1.Text = "Test algo";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
             // buttonSearchCOM
             // 
@@ -220,7 +220,7 @@ namespace PSA_CVM2
             this.buttonSearchCOM.TabIndex = 9;
             this.buttonSearchCOM.Text = "Search";
             this.buttonSearchCOM.UseVisualStyleBackColor = true;
-            this.buttonSearchCOM.Click += new System.EventHandler(this.buttonSearchCOM_Click);
+            this.buttonSearchCOM.Click += new System.EventHandler(this.ButtonSearchCOM_Click);
             // 
             // textBoxVin
             // 
@@ -246,7 +246,7 @@ namespace PSA_CVM2
             this.buttonIdentifyVIN.TabIndex = 4;
             this.buttonIdentifyVIN.Text = "Read VIN";
             this.buttonIdentifyVIN.UseVisualStyleBackColor = true;
-            this.buttonIdentifyVIN.Click += new System.EventHandler(this.buttonIdentifyVIN_Click);
+            this.buttonIdentifyVIN.Click += new System.EventHandler(this.ButtonIdentifyVIN_Click);
             // 
             // buttonClearLog
             // 
@@ -256,7 +256,7 @@ namespace PSA_CVM2
             this.buttonClearLog.TabIndex = 7;
             this.buttonClearLog.Text = "Clear Log";
             this.buttonClearLog.UseVisualStyleBackColor = true;
-            this.buttonClearLog.Click += new System.EventHandler(this.buttonClearLog_Click);
+            this.buttonClearLog.Click += new System.EventHandler(this.ButtonClearLog_Click);
             // 
             // label1
             // 
@@ -284,7 +284,7 @@ namespace PSA_CVM2
             this.buttonStop.TabIndex = 1;
             this.buttonStop.Text = "Stop";
             this.buttonStop.UseVisualStyleBackColor = true;
-            this.buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
+            this.buttonStop.Click += new System.EventHandler(this.ButtonStop_Click);
             // 
             // buttonStart
             // 
@@ -294,7 +294,7 @@ namespace PSA_CVM2
             this.buttonStart.TabIndex = 0;
             this.buttonStart.Text = "Start";
             this.buttonStart.UseVisualStyleBackColor = true;
-            this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
+            this.buttonStart.Click += new System.EventHandler(this.ButtonStart_Click);
             // 
             // buttonWriteCodingBSI
             // 
@@ -315,13 +315,13 @@ namespace PSA_CVM2
             this.buttonReadCodingBSI.TabIndex = 2;
             this.buttonReadCodingBSI.Text = "Read Coding";
             this.buttonReadCodingBSI.UseVisualStyleBackColor = true;
-            this.buttonReadCodingBSI.Click += new System.EventHandler(this.buttonReadCodingBSI_Click);
+            this.buttonReadCodingBSI.Click += new System.EventHandler(this.ButtonReadCodingBSI_Click);
             // 
             // spArduino
             // 
             this.spArduino.BaudRate = 115200;
             this.spArduino.PortName = "COM5";
-            this.spArduino.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.spArduino_DataReceived);
+            this.spArduino.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.SpArduino_DataReceived);
             // 
             // textBoxInfo
             // 
@@ -476,7 +476,7 @@ namespace PSA_CVM2
             this.buttonIdentifyBSI.Size = new System.Drawing.Size(108, 23);
             this.buttonIdentifyBSI.TabIndex = 19;
             this.buttonIdentifyBSI.Text = "Identify";
-            this.buttonIdentifyBSI.Click += new System.EventHandler(this.buttonIdentifyBSI_Click);
+            this.buttonIdentifyBSI.Click += new System.EventHandler(this.ButtonIdentifyBSI_Click);
             // 
             // tabPage2
             // 
@@ -524,7 +524,7 @@ namespace PSA_CVM2
             this.buttonReadCodingCVM.TabIndex = 19;
             this.buttonReadCodingCVM.Text = "Read Coding";
             this.buttonReadCodingCVM.UseVisualStyleBackColor = true;
-            this.buttonReadCodingCVM.Click += new System.EventHandler(this.buttonReadCodingCVM_Click);
+            this.buttonReadCodingCVM.Click += new System.EventHandler(this.ButtonReadCodingCVM_Click);
             // 
             // textBoxHWCVM
             // 
@@ -583,7 +583,7 @@ namespace PSA_CVM2
             this.buttonIdentifyCVM.TabIndex = 5;
             this.buttonIdentifyCVM.Text = "Identify";
             this.buttonIdentifyCVM.UseVisualStyleBackColor = true;
-            this.buttonIdentifyCVM.Click += new System.EventHandler(this.buttonIdentifyCVM_Click);
+            this.buttonIdentifyCVM.Click += new System.EventHandler(this.ButtonIdentifyCVM_Click);
             // 
             // tabPage3
             // 
@@ -631,7 +631,7 @@ namespace PSA_CVM2
             this.buttonReadCodingDAE.TabIndex = 25;
             this.buttonReadCodingDAE.Text = "Read Coding";
             this.buttonReadCodingDAE.UseVisualStyleBackColor = true;
-            this.buttonReadCodingDAE.Click += new System.EventHandler(this.buttonReadCodingDAE_Click);
+            this.buttonReadCodingDAE.Click += new System.EventHandler(this.ButtonReadCodingDAE_Click);
             // 
             // textBox1
             // 
@@ -690,7 +690,7 @@ namespace PSA_CVM2
             this.buttonIdentifyDAE.TabIndex = 6;
             this.buttonIdentifyDAE.Text = "Identify";
             this.buttonIdentifyDAE.UseVisualStyleBackColor = true;
-            this.buttonIdentifyDAE.Click += new System.EventHandler(this.buttonIdentifyDAE_Click);
+            this.buttonIdentifyDAE.Click += new System.EventHandler(this.ButtonIdentifyDAE_Click);
             // 
             // tabPage4
             // 
@@ -731,7 +731,7 @@ namespace PSA_CVM2
             this.buttonReadCodingAAS.TabIndex = 34;
             this.buttonReadCodingAAS.Text = "Read Coding";
             this.buttonReadCodingAAS.UseVisualStyleBackColor = true;
-            this.buttonReadCodingAAS.Click += new System.EventHandler(this.buttonReadCodingAAS_Click);
+            this.buttonReadCodingAAS.Click += new System.EventHandler(this.ButtonReadCodingAAS_Click);
             // 
             // textBoxCodingAAS
             // 
@@ -797,7 +797,7 @@ namespace PSA_CVM2
             this.buttonIdentifyAAS.TabIndex = 6;
             this.buttonIdentifyAAS.Text = "Identify";
             this.buttonIdentifyAAS.UseVisualStyleBackColor = true;
-            this.buttonIdentifyAAS.Click += new System.EventHandler(this.buttonIdentifyAAS_Click);
+            this.buttonIdentifyAAS.Click += new System.EventHandler(this.ButtonIdentifyAAS_Click);
             // 
             // tabPage5
             // 
@@ -903,7 +903,7 @@ namespace PSA_CVM2
             this.buttonIdentifyARTIV.TabIndex = 7;
             this.buttonIdentifyARTIV.Text = "Identify";
             this.buttonIdentifyARTIV.UseVisualStyleBackColor = true;
-            this.buttonIdentifyARTIV.Click += new System.EventHandler(this.buttonIdentifyARTIV_Click);
+            this.buttonIdentifyARTIV.Click += new System.EventHandler(this.ButtonIdentifyARTIV_Click);
             // 
             // tabPage6
             // 
@@ -979,7 +979,7 @@ namespace PSA_CVM2
             this.buttonIdentifyCOMBINE.TabIndex = 44;
             this.buttonIdentifyCOMBINE.Text = "Identify";
             this.buttonIdentifyCOMBINE.UseVisualStyleBackColor = true;
-            this.buttonIdentifyCOMBINE.Click += new System.EventHandler(this.buttonIdentifyCOMBINE_Click);
+            this.buttonIdentifyCOMBINE.Click += new System.EventHandler(this.ButtonIdentifyCOMBINE_Click);
             // 
             // tabPage7
             // 
@@ -1055,7 +1055,7 @@ namespace PSA_CVM2
             this.buttonIdentifyTELEMAT.TabIndex = 44;
             this.buttonIdentifyTELEMAT.Text = "Identify";
             this.buttonIdentifyTELEMAT.UseVisualStyleBackColor = true;
-            this.buttonIdentifyTELEMAT.Click += new System.EventHandler(this.buttonIdentifyTELEMAT_Click);
+            this.buttonIdentifyTELEMAT.Click += new System.EventHandler(this.ButtonIdentifyTELEMAT_Click);
             // 
             // Form1
             // 
