@@ -473,7 +473,7 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("1001"));
             Thread.Sleep(10);
             spArduino.WriteLine(String.Format(DAE));
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " >" + String.Format(DAE) + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " " + String.Format(DAE) + Environment.NewLine;
             Thread.Sleep(100);
             spArduino.WriteLine(String.Format("81"));
             richTextBoxLog.Text += DateTime.Now.ToString() + " > 81" + Environment.NewLine;

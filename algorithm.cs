@@ -123,7 +123,6 @@ namespace PSA_CVM2
 
             return result;
         }
-
         public static void Execute()
         {
             Console.WriteLine(getKey("11111111", "D91C"));
