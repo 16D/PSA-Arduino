@@ -179,11 +179,23 @@ namespace PSA_CVM2
                         if (!Directory.Exists(expectedDirectory))
                         {Directory.CreateDirectory(expectedDirectory);}
                     var path = Path.Combine(expectedDirectory, filename);
+                if (File.Exists(path))
+                {
                     using (FileStream fileStream = File.Create(path))
                     {
-                            var text = textBoxVin.Text;
-                            var content = Encoding.UTF8.GetBytes(text);
-                           fileStream.Write(content, 0, content.Length);
+                        var text = textBoxVin.Text;
+                        var content = Encoding.UTF8.GetBytes(text);
+                        fileStream.Write(content, 0, content.Length);
+                    }
+                }
+                if (!File.Exists(path))
+                    {
+                    using (FileStream fileStream = File.OpenWrite(path))
+                    {
+                        var text = textBoxVin.Text;
+                        var content = Encoding.UTF8.GetBytes(text);
+                        fileStream.Write(content, 0, content.Length);
+                    }
                     }
                 }
         }
@@ -274,9 +286,30 @@ namespace PSA_CVM2
             odpowiedz = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString() + " < " + String.Format(odpowiedz) + Environment.NewLine;
         }
-        public void ReadZone(string zone,string odpowiedz)
+        private void ConnectModuleKWP(string type)
+        {
+            string odpowiedz = string.Empty;
+            spArduino.WriteLine(String.Format("1001"));
+            richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 1001") + Environment.NewLine;
+            Thread.Sleep(100);
+            spArduino.WriteLine(String.Format(type));
+            richTextBoxLog.Text += DateTime.Now.ToString() + " " + String.Format(type) + Environment.NewLine;
+            Thread.Sleep(100);
+            spArduino.WriteLine(String.Format("81"));
+            richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 81") + Environment.NewLine;
+            Thread.Sleep(500);
+            odpowiedz = serialData;
+            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + String.Format(odpowiedz) + Environment.NewLine;
+        }
+        public void ReadZoneUDS(string zone,string odpowiedz)
         {
             spArduino.WriteLine("22" + zone);
+            Thread.Sleep(1500);
+            odpowiedz = serialData;
+        }
+        public void ReadZoneKWP(string zone, string odpowiedz)
+        {
+            spArduino.WriteLine("21" + zone);
             Thread.Sleep(1500);
             odpowiedz = serialData;
         }
@@ -627,9 +660,23 @@ namespace PSA_CVM2
             }
         }
 
-        public void Button1_Click(object sender, EventArgs e)
+        public void ButtonAlgo_Click(object sender, EventArgs e)
         {
             
+        }
+
+        private void buttonSaveLog_Click(object sender, EventArgs e)
+        {
+            var filename = "Log" + textBoxVin.Text + ".txt";
+            var binPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
+            var expectedDirectory = Path.Combine(binPath, "Logs");
+            var path = Path.Combine(expectedDirectory, filename); 
+            using (FileStream fileStream = File.OpenWrite(path))
+                {
+                    var text = richTextBoxLog.Text;
+                    var content = Encoding.UTF8.GetBytes(text);
+                    fileStream.Write(content, 0, content.Length);
+                }
         }
     }
 }

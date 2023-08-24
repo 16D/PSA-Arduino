@@ -32,12 +32,13 @@ namespace PSA_CVM2
         {
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.buttonSaveLog = new System.Windows.Forms.Button();
             this.label29 = new System.Windows.Forms.Label();
             this.label28 = new System.Windows.Forms.Label();
             this.label27 = new System.Windows.Forms.Label();
             this.textBoxKey = new System.Windows.Forms.TextBox();
             this.textBoxSeed = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.buttonAlgo = new System.Windows.Forms.Button();
             this.buttonSearchCOM = new System.Windows.Forms.Button();
             this.textBoxVin = new System.Windows.Forms.TextBox();
             this.richTextBoxLog = new System.Windows.Forms.RichTextBox();
@@ -139,12 +140,13 @@ namespace PSA_CVM2
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.buttonSaveLog);
             this.panel1.Controls.Add(this.label29);
             this.panel1.Controls.Add(this.label28);
             this.panel1.Controls.Add(this.label27);
             this.panel1.Controls.Add(this.textBoxKey);
             this.panel1.Controls.Add(this.textBoxSeed);
-            this.panel1.Controls.Add(this.button1);
+            this.panel1.Controls.Add(this.buttonAlgo);
             this.panel1.Controls.Add(this.buttonSearchCOM);
             this.panel1.Controls.Add(this.textBoxVin);
             this.panel1.Controls.Add(this.richTextBoxLog);
@@ -158,6 +160,16 @@ namespace PSA_CVM2
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(517, 466);
             this.panel1.TabIndex = 0;
+            // 
+            // buttonSaveLog
+            // 
+            this.buttonSaveLog.Location = new System.Drawing.Point(262, 438);
+            this.buttonSaveLog.Name = "buttonSaveLog";
+            this.buttonSaveLog.Size = new System.Drawing.Size(250, 23);
+            this.buttonSaveLog.TabIndex = 16;
+            this.buttonSaveLog.Text = "Save Log";
+            this.buttonSaveLog.UseVisualStyleBackColor = true;
+            this.buttonSaveLog.Click += new System.EventHandler(this.buttonSaveLog_Click);
             // 
             // label29
             // 
@@ -202,15 +214,15 @@ namespace PSA_CVM2
             this.textBoxSeed.TabIndex = 11;
             this.textBoxSeed.Text = "F0F07A5B";
             // 
-            // button1
+            // buttonAlgo
             // 
-            this.button1.Location = new System.Drawing.Point(5, 68);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(104, 23);
-            this.button1.TabIndex = 10;
-            this.button1.Text = "Test algo";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            this.buttonAlgo.Location = new System.Drawing.Point(5, 68);
+            this.buttonAlgo.Name = "buttonAlgo";
+            this.buttonAlgo.Size = new System.Drawing.Size(104, 23);
+            this.buttonAlgo.TabIndex = 10;
+            this.buttonAlgo.Text = "Test algo";
+            this.buttonAlgo.UseVisualStyleBackColor = true;
+            this.buttonAlgo.Click += new System.EventHandler(this.ButtonAlgo_Click);
             // 
             // buttonSearchCOM
             // 
@@ -252,7 +264,7 @@ namespace PSA_CVM2
             // 
             this.buttonClearLog.Location = new System.Drawing.Point(6, 438);
             this.buttonClearLog.Name = "buttonClearLog";
-            this.buttonClearLog.Size = new System.Drawing.Size(507, 23);
+            this.buttonClearLog.Size = new System.Drawing.Size(250, 23);
             this.buttonClearLog.TabIndex = 7;
             this.buttonClearLog.Text = "Clear Log";
             this.buttonClearLog.UseVisualStyleBackColor = true;
@@ -1108,7 +1120,6 @@ namespace PSA_CVM2
         private System.Windows.Forms.Button buttonIdentifyCVM;
         private System.Windows.Forms.Button buttonClearLog;
         private System.Windows.Forms.TextBox textBoxVin;
-        private System.Windows.Forms.RichTextBox richTextBoxLog;
         private System.Windows.Forms.Button buttonIdentifyBSI;
         private System.Windows.Forms.Button buttonIdentifyDAE;
         private System.Windows.Forms.Button buttonIdentifyAAS;
@@ -1179,12 +1190,14 @@ namespace PSA_CVM2
         private System.Windows.Forms.TextBox textBoxSWTELEMAT;
         private System.Windows.Forms.TextBox textBoxTypTELEMAT;
         private System.Windows.Forms.Button buttonIdentifyTELEMAT;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button buttonAlgo;
         private System.Windows.Forms.TextBox textBoxSeed;
         private System.Windows.Forms.TextBox textBoxKey;
         private System.Windows.Forms.Label label28;
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.Label label29;
+        private System.Windows.Forms.Button buttonSaveLog;
+        private System.Windows.Forms.RichTextBox richTextBoxLog;
     }
 }
 
