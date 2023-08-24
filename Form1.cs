@@ -662,9 +662,41 @@ namespace PSA_CVM2
                 textBoxTypTELEMAT.Text = "Unknown " + typtelemat;
             }
         }
+        ushort crc16_x25(byte[] data, int len)
+        {
+            ushort crc = 0xffff;
+            for (ushort i = 0; i < len; i++)
+            {
+                crc ^= data[i];
+                for (ushort k = 0; k < 8; k++)
+                    crc = (ushort)((crc & 1) != 0 ? (crc >> 1) ^ 0x8408 : crc >> 1);
+            }
+            return (ushort)~crc;
+        }
+        uint ROL(uint val, int rot)
+        {
+            return (uint)(val << rot) | (val >> (16 - rot));
+        }
+        public static byte[] StringToByteArray(String hex)
+        {
+            int NumberChars = hex.Length;
+            byte[] bytes = new byte[NumberChars / 2];
+            for (int i = 0; i < NumberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            return bytes;
+        }
         public void ButtonAlgo_Click(object sender, EventArgs e)
         {
-            
+            string str = "34A00000000605CCFD000000";
+            byte[] BTS = StringToByteArray(str);
+            ushort calc_crc = crc16_x25(BTS, BTS.Length);
+
+            calc_crc = (ushort)ROL(calc_crc, 8);
+
+            richTextBoxLog.Text += $"CRC16-x25 : {calc_crc.ToString("X")}" + Environment.NewLine;
+            string CodingMessege = str + calc_crc.ToString("X");
+            richTextBoxLog.Text += CodingMessege + Environment.NewLine;
+
         }
         private void buttonSaveLog_Click(object sender, EventArgs e)
         {
