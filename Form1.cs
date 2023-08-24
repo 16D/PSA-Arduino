@@ -16,6 +16,7 @@ using System.Security.Policy;
 using System.IO.Pipes;
 using System.Windows.Forms.VisualStyles;
 using System.Runtime.InteropServices.ComTypes;
+using System.Net.NetworkInformation;
 
 namespace PSA_CVM2
 {
@@ -133,7 +134,7 @@ namespace PSA_CVM2
                 Vinbsi();
                 Thread.Sleep(1500);
                 spArduino.WriteLine(String.Format("1001"));
-                richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 1001") + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1001") + Environment.NewLine;
   
             }
         }
@@ -141,10 +142,11 @@ namespace PSA_CVM2
         {
             textBoxVin.Clear();
             string zone = "F190";
-            spArduino.WriteLine(String.Format("22" + zone));  //  wysyłamy polecenie CAN do odczytu strefy               
+            spArduino.WriteLine(String.Format("22" + zone));  //  wysyłamy polecenie CAN do odczytu strefy
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " > " + String.Format("22" + zone) + Environment.NewLine;
             Thread.Sleep(500);
             string odebraneVIN = serialData;
-            richTextBoxLog.Text += "< " + String.Format(odebraneVIN) + Environment.NewLine;
+            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + String.Format(odebraneVIN) + Environment.NewLine;
 
                 string toRemove = "62F190";                                                                  // procedura usuwania polecania CAN z ciagu danych do wyświetlenia VIN
                 string result = string.Empty;
@@ -173,30 +175,33 @@ namespace PSA_CVM2
                     string VIN1 = charValue.ToString();
                     textBoxVin.AppendText(VIN1);
                     UnlockIdentification();
-                    var filename = "Log" + textBoxVin.Text + ".txt";
+                if (textBoxVin.TextLength == 17)
+                {
+                    var filename = "Log-" + textBoxVin.Text + ".txt";
                     var binPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
                     var expectedDirectory = Path.Combine(binPath, "Logs");
-                        if (!Directory.Exists(expectedDirectory))
-                        {Directory.CreateDirectory(expectedDirectory);}
+                    if (!Directory.Exists(expectedDirectory))
+                    { Directory.CreateDirectory(expectedDirectory); }
                     var path = Path.Combine(expectedDirectory, filename);
-                if (File.Exists(path))
-                {
-                    using (FileStream fileStream = File.Create(path))
+                    if (!File.Exists(path))
                     {
-                        var text = textBoxVin.Text;
-                        var content = Encoding.UTF8.GetBytes(text);
-                        fileStream.Write(content, 0, content.Length);
+                        using (FileStream fileStream = File.Create(path))
+                        {
+                            var text = "Log" + DateTime.Now.ToString();
+                            var content = Encoding.UTF8.GetBytes(text);
+                            fileStream.Write(content, 0, content.Length);
+                        }
+                    }
+                    if (File.Exists(path))
+                    {
+                        using (FileStream fileStream = File.OpenWrite(path));
+//                        {
+//                            var text = "Log" + DateTime.Now.ToString();
+//                            var content = Encoding.UTF8.GetBytes(text);
+//                            fileStream.Write(content, 0, content.Length);
+//                        }
                     }
                 }
-                if (!File.Exists(path))
-                    {
-                    using (FileStream fileStream = File.OpenWrite(path))
-                    {
-                        var text = textBoxVin.Text;
-                        var content = Encoding.UTF8.GetBytes(text);
-                        fileStream.Write(content, 0, content.Length);
-                    }
-                    }
                 }
         }
         private void LockIdentification()
@@ -526,8 +531,6 @@ namespace PSA_CVM2
             string[] Ref = { odebraneAASZI.Substring(48, 6) };
             textBoxSWAAS.Text = "96" + Ref[0] + "80";
             textBoxHWAAS.Text = odebraneAASZA.Substring(20, 10);
-
-
             string typAAS = odebraneAASZI.Substring(14, 4);                                           // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
             richTextBoxLog.Text += typAAS + Environment.NewLine;
             textBoxTypAAS.Text = typAAS;
@@ -667,13 +670,13 @@ namespace PSA_CVM2
 
         private void buttonSaveLog_Click(object sender, EventArgs e)
         {
-            var filename = "Log" + textBoxVin.Text + ".txt";
+            var filename = "Log-" + textBoxVin.Text + ".txt";
             var binPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
             var expectedDirectory = Path.Combine(binPath, "Logs");
             var path = Path.Combine(expectedDirectory, filename); 
             using (FileStream fileStream = File.OpenWrite(path))
                 {
-                    var text = richTextBoxLog.Text;
+                    var text = Environment.NewLine + richTextBoxLog.Text;
                     var content = Encoding.UTF8.GetBytes(text);
                     fileStream.Write(content, 0, content.Length);
                 }
