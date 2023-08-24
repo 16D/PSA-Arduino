@@ -280,7 +280,7 @@ namespace PSA_CVM2
         {
             string odpowiedz = string.Empty;
             spArduino.WriteLine(String.Format("1001"));
-            richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 1001") + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1001") + Environment.NewLine;
             Thread.Sleep(100);
             spArduino.WriteLine(String.Format(type));
             richTextBoxLog.Text += DateTime.Now.ToString() + " " + String.Format(type) + Environment.NewLine;
@@ -324,11 +324,11 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
             Thread.Sleep(1500);
             string odebraneBSIZI = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneBSIZI + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneBSIZI + Environment.NewLine;
             spArduino.WriteLine(String.Format("22F080"));
             Thread.Sleep(1500);
             string odebraneBSIZA = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneBSIZA + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneBSIZA + Environment.NewLine;
             string Ref = odebraneBSIZI.Substring(48, 6);
             textBoxSWBSI.Text = "96" + Ref + "80";
             textBoxHWBSI.Text = odebraneBSIZA.Substring(20, 10);
@@ -413,11 +413,11 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
             Thread.Sleep(1500);
             string odebraneCVMZI = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneCVMZI + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneCVMZI + Environment.NewLine;
             spArduino.WriteLine(String.Format("22F080"));  //  wysyłamy polecenie CAN do odczytu strefy               
             Thread.Sleep(1500);
             string odebraneCVMZA = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneCVMZA + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneCVMZA + Environment.NewLine;
             string Ref = odebraneCVMZI.Substring(48, 6);
             textBoxSWCVM.Text = "96" + Ref + "80";
             textBoxHWCVM.Text = odebraneCVMZA.Substring(20, 10);
@@ -473,7 +473,7 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("1001"));
             Thread.Sleep(10);
             spArduino.WriteLine(String.Format(DAE));
-            richTextBoxLog.Text += DateTime.Now.ToString() + " >" + String.Format(DAE) + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " >" + String.Format(DAE) + Environment.NewLine;
             Thread.Sleep(100);
             spArduino.WriteLine(String.Format("81"));
             richTextBoxLog.Text += DateTime.Now.ToString() + " > 81" + Environment.NewLine;
@@ -481,12 +481,12 @@ namespace PSA_CVM2
             odpowiedz = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString() + " < " + String.Format(odpowiedz) + Environment.NewLine;
             spArduino.WriteLine(String.Format("21FE"));
-            richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 21FE") + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 21FE") + Environment.NewLine;
             Thread.Sleep(100);
             string odebraneDAEZI = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString() + " > " + odebraneDAEZI + Environment.NewLine;
             spArduino.WriteLine(String.Format("2180"));
-            richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 2180") + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 2180") + Environment.NewLine;
             Thread.Sleep(100);
             string odebraneDAEZA = serialData;                                
             richTextBoxLog.Text += DateTime.Now.ToString() + " > " + odebraneDAEZA + Environment.NewLine;
@@ -523,11 +523,11 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
             Thread.Sleep(1500);
             string odebraneAASZI = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneAASZI + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneAASZI + Environment.NewLine;
             spArduino.WriteLine(String.Format("22F080"));  //  wysyłamy polecenie CAN do odczytu strefy               
             Thread.Sleep(1500);
             string odebraneAASZA = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneAASZA + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneAASZA + Environment.NewLine;
             string[] Ref = { odebraneAASZI.Substring(48, 6) };
             textBoxSWAAS.Text = "96" + Ref[0] + "80";
             textBoxHWAAS.Text = odebraneAASZA.Substring(20, 10);
@@ -575,11 +575,11 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
             Thread.Sleep(1500);
             string odebraneARTIVZI = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneARTIVZI + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneARTIVZI + Environment.NewLine;
             spArduino.WriteLine(String.Format("22F080"));  //  wysyłamy polecenie CAN do odczytu strefy               
             Thread.Sleep(1500);
             string odebraneARTIVZA = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneARTIVZA + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneARTIVZA + Environment.NewLine;
             string Ref = odebraneARTIVZI.Substring(48, 6);
             textBoxSWARTIV.Text = "96" + Ref + "80";
             textBoxHWARTIV.Text = odebraneARTIVZA.Substring(20, 10);
@@ -608,11 +608,11 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
             Thread.Sleep(1500);
             string odebraneCOMBINEZI = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneCOMBINEZI + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneCOMBINEZI + Environment.NewLine;
             spArduino.WriteLine(String.Format("22F080"));  //  wysyłamy polecenie CAN do odczytu strefy               
             Thread.Sleep(1500);
             string odebraneCOMBINEZA = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneCOMBINEZA + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneCOMBINEZA + Environment.NewLine;
             string Ref = odebraneCOMBINEZI.Substring(48, 6);
             textBoxSWCOMBINE.Text = "96" + Ref + "80";
             textBoxHWCOMBINE.Text = odebraneCOMBINEZA.Substring(20, 10);
@@ -638,11 +638,11 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
             Thread.Sleep(1500);
             string odebraneTELEMATZI = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneTELEMATZI + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneTELEMATZI + Environment.NewLine;
             spArduino.WriteLine(String.Format("22F080"));  //  wysyłamy polecenie CAN do odczytu strefy               
             Thread.Sleep(1500);
             string odebraneTELEMATZA = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebraneTELEMATZA + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneTELEMATZA + Environment.NewLine;
             string Ref = odebraneTELEMATZI.Substring(48, 6);
             textBoxSWTELEMAT.Text = "96" + Ref + "80";
             textBoxHWTELEMAT.Text = odebraneTELEMATZA.Substring(20, 10);
