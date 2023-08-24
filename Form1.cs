@@ -662,12 +662,10 @@ namespace PSA_CVM2
                 textBoxTypTELEMAT.Text = "Unknown " + typtelemat;
             }
         }
-
         public void ButtonAlgo_Click(object sender, EventArgs e)
         {
             
         }
-
         private void buttonSaveLog_Click(object sender, EventArgs e)
         {
             var filename = "Log-" + textBoxVin.Text + ".txt";
