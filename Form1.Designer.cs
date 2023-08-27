@@ -33,7 +33,6 @@ namespace PSA_CVM2
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
             this.buttonSaveLog = new System.Windows.Forms.Button();
-            this.label29 = new System.Windows.Forms.Label();
             this.label28 = new System.Windows.Forms.Label();
             this.label27 = new System.Windows.Forms.Label();
             this.textBoxKey = new System.Windows.Forms.TextBox();
@@ -54,11 +53,15 @@ namespace PSA_CVM2
             this.textBoxInfo = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label32 = new System.Windows.Forms.Label();
+            this.label31 = new System.Windows.Forms.Label();
+            this.label30 = new System.Windows.Forms.Label();
+            this.textBoxZone = new System.Windows.Forms.TextBox();
             this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
-            this.textBox2373Coding = new System.Windows.Forms.TextBox();
+            this.textBoxNewCoding = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.textBox2326Coding = new System.Windows.Forms.TextBox();
+            this.textBoxCoding = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.textBoxHWBSI = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -141,7 +144,6 @@ namespace PSA_CVM2
             // panel1
             // 
             this.panel1.Controls.Add(this.buttonSaveLog);
-            this.panel1.Controls.Add(this.label29);
             this.panel1.Controls.Add(this.label28);
             this.panel1.Controls.Add(this.label27);
             this.panel1.Controls.Add(this.textBoxKey);
@@ -170,15 +172,6 @@ namespace PSA_CVM2
             this.buttonSaveLog.Text = "Save Log";
             this.buttonSaveLog.UseVisualStyleBackColor = true;
             this.buttonSaveLog.Click += new System.EventHandler(this.buttonSaveLog_Click);
-            // 
-            // label29
-            // 
-            this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(349, 70);
-            this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(154, 16);
-            this.label29.TabIndex = 15;
-            this.label29.Text = "odpowiedź = 7DDC57DF";
             // 
             // label28
             // 
@@ -243,6 +236,7 @@ namespace PSA_CVM2
             // 
             // richTextBoxLog
             // 
+            this.richTextBoxLog.HideSelection = false;
             this.richTextBoxLog.Location = new System.Drawing.Point(0, 117);
             this.richTextBoxLog.Name = "richTextBoxLog";
             this.richTextBoxLog.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
@@ -313,17 +307,18 @@ namespace PSA_CVM2
             // buttonWriteCodingBSI
             // 
             this.buttonWriteCodingBSI.Enabled = false;
-            this.buttonWriteCodingBSI.Location = new System.Drawing.Point(6, 121);
+            this.buttonWriteCodingBSI.Location = new System.Drawing.Point(250, 172);
             this.buttonWriteCodingBSI.Name = "buttonWriteCodingBSI";
             this.buttonWriteCodingBSI.Size = new System.Drawing.Size(108, 23);
             this.buttonWriteCodingBSI.TabIndex = 3;
             this.buttonWriteCodingBSI.Text = "Write Coding";
             this.buttonWriteCodingBSI.UseVisualStyleBackColor = true;
+            this.buttonWriteCodingBSI.Click += new System.EventHandler(this.buttonWriteCodingBSI_Click);
             // 
             // buttonReadCodingBSI
             // 
             this.buttonReadCodingBSI.Enabled = false;
-            this.buttonReadCodingBSI.Location = new System.Drawing.Point(6, 92);
+            this.buttonReadCodingBSI.Location = new System.Drawing.Point(250, 95);
             this.buttonReadCodingBSI.Name = "buttonReadCodingBSI";
             this.buttonReadCodingBSI.Size = new System.Drawing.Size(108, 23);
             this.buttonReadCodingBSI.TabIndex = 2;
@@ -361,11 +356,15 @@ namespace PSA_CVM2
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.label32);
+            this.tabPage1.Controls.Add(this.label31);
+            this.tabPage1.Controls.Add(this.label30);
+            this.tabPage1.Controls.Add(this.textBoxZone);
             this.tabPage1.Controls.Add(this.label14);
             this.tabPage1.Controls.Add(this.label13);
-            this.tabPage1.Controls.Add(this.textBox2373Coding);
+            this.tabPage1.Controls.Add(this.textBoxNewCoding);
             this.tabPage1.Controls.Add(this.label6);
-            this.tabPage1.Controls.Add(this.textBox2326Coding);
+            this.tabPage1.Controls.Add(this.textBoxCoding);
             this.tabPage1.Controls.Add(this.label5);
             this.tabPage1.Controls.Add(this.textBoxHWBSI);
             this.tabPage1.Controls.Add(this.label4);
@@ -384,10 +383,44 @@ namespace PSA_CVM2
             this.tabPage1.Text = "BSI";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(41, 172);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(73, 16);
+            this.label32.TabIndex = 23;
+            this.label32.Text = "New value:";
+            // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(69, 134);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(45, 16);
+            this.label31.TabIndex = 22;
+            this.label31.Text = "Value:";
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(72, 99);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(41, 16);
+            this.label30.TabIndex = 21;
+            this.label30.Text = "Zone:";
+            // 
+            // textBoxZone
+            // 
+            this.textBoxZone.Location = new System.Drawing.Point(131, 96);
+            this.textBoxZone.Name = "textBoxZone";
+            this.textBoxZone.Size = new System.Drawing.Size(100, 22);
+            this.textBoxZone.TabIndex = 20;
+            // 
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(261, 187);
+            this.label14.Location = new System.Drawing.Point(128, 241);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(156, 16);
             this.label14.TabIndex = 18;
@@ -396,39 +429,40 @@ namespace PSA_CVM2
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(262, 150);
+            this.label13.Location = new System.Drawing.Point(156, 210);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(115, 16);
             this.label13.TabIndex = 17;
             this.label13.Text = "00=without/01=with";
             // 
-            // textBox2373Coding
+            // textBoxNewCoding
             // 
-            this.textBox2373Coding.Location = new System.Drawing.Point(155, 184);
-            this.textBox2373Coding.Name = "textBox2373Coding";
-            this.textBox2373Coding.Size = new System.Drawing.Size(100, 22);
-            this.textBox2373Coding.TabIndex = 16;
+            this.textBoxNewCoding.Location = new System.Drawing.Point(131, 172);
+            this.textBoxNewCoding.Name = "textBoxNewCoding";
+            this.textBoxNewCoding.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.textBoxNewCoding.Size = new System.Drawing.Size(100, 22);
+            this.textBoxNewCoding.TabIndex = 16;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 187);
+            this.label6.Location = new System.Drawing.Point(6, 241);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(107, 16);
             this.label6.TabIndex = 15;
             this.label6.Text = "2373 Lane Assist";
             // 
-            // textBox2326Coding
+            // textBoxCoding
             // 
-            this.textBox2326Coding.Location = new System.Drawing.Point(155, 150);
-            this.textBox2326Coding.Name = "textBox2326Coding";
-            this.textBox2326Coding.Size = new System.Drawing.Size(100, 22);
-            this.textBox2326Coding.TabIndex = 14;
+            this.textBoxCoding.Location = new System.Drawing.Point(131, 134);
+            this.textBoxCoding.Name = "textBoxCoding";
+            this.textBoxCoding.Size = new System.Drawing.Size(100, 22);
+            this.textBoxCoding.TabIndex = 14;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(6, 156);
+            this.label5.Location = new System.Drawing.Point(6, 210);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(144, 16);
             this.label5.TabIndex = 13;
@@ -628,6 +662,7 @@ namespace PSA_CVM2
             this.buttonWriteCodingDAE.TabIndex = 27;
             this.buttonWriteCodingDAE.Text = "Write Coding";
             this.buttonWriteCodingDAE.UseVisualStyleBackColor = true;
+            this.buttonWriteCodingDAE.Click += new System.EventHandler(this.buttonWriteCodingDAE_Click);
             // 
             // textBoxDAECoding
             // 
@@ -1080,7 +1115,7 @@ namespace PSA_CVM2
             this.Controls.Add(this.textBoxInfo);
             this.Controls.Add(this.panel1);
             this.Name = "Form1";
-            this.Text = "PSA Arduino 0.1v";
+            this.Text = "PSA Arduino 27.08.23";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.tabControl1.ResumeLayout(false);
@@ -1133,9 +1168,9 @@ namespace PSA_CVM2
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBoxHWBSI;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox2326Coding;
+        private System.Windows.Forms.TextBox textBoxCoding;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox textBox2373Coding;
+        private System.Windows.Forms.TextBox textBoxNewCoding;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox textBoxHWCVM;
         private System.Windows.Forms.Label label7;
@@ -1197,9 +1232,12 @@ namespace PSA_CVM2
         private System.Windows.Forms.TextBox textBoxKey;
         private System.Windows.Forms.Label label28;
         private System.Windows.Forms.Label label27;
-        private System.Windows.Forms.Label label29;
         private System.Windows.Forms.Button buttonSaveLog;
         private System.Windows.Forms.RichTextBox richTextBoxLog;
+        private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.TextBox textBoxZone;
+        private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.Label label32;
     }
 }
 
