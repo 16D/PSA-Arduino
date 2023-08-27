@@ -309,7 +309,7 @@ namespace PSA_CVM2
         {
             spArduino.WriteLine("22" + zone);
             richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " > 22" + zone + Environment.NewLine;
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
             string odpowiedz = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odpowiedz + Environment.NewLine;
             return odpowiedz;
