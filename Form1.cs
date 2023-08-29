@@ -176,30 +176,16 @@ namespace PSA_CVM2
                     UnlockIdentification();
                 if (textBoxVin.TextLength == 17)
                 {
-                    var filename = "Log-" + textBoxVin.Text + ".txt";
-                    var binPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
-                    var expectedDirectory = Path.Combine(binPath, "Logs");
-                    if (!Directory.Exists(expectedDirectory))
-                    { Directory.CreateDirectory(expectedDirectory); }
-                    var path = Path.Combine(expectedDirectory, filename);
+                    if (!Directory.Exists(@"Logs"))
+                    { Directory.CreateDirectory("Logs"); }
+                    string path = @"Logs\Log-" + textBoxVin.Text + ".txt";
                     if (!File.Exists(path))
                     {
-                        using (FileStream fileStream = File.Create(path))
+                        using (StreamWriter sw = File.CreateText(path))
                         {
-                            var text = "Log" + DateTime.Now.ToString();
-                            var content = Encoding.UTF8.GetBytes(text);
-                            fileStream.Write(content, 0, content.Length);
+                            sw.WriteLine("Log");
                         }
                     }
-/*                    if (File.Exists(path))
-                    {
-                        using (FileStream fileStream = File.OpenWrite(path));
-//                        {
-//                            var text = "Log" + DateTime.Now.ToString();
-//                            var content = Encoding.UTF8.GetBytes(text);
-//                            fileStream.Write(content, 0, content.Length);
-//                        }
-                    }*/
                 }
                 }
         }
@@ -728,16 +714,61 @@ namespace PSA_CVM2
         }
         private void buttonSaveLog_Click(object sender, EventArgs e)
         {
-            var filename = "Log-" + textBoxVin.Text + ".txt";
-            var binPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
-            var expectedDirectory = Path.Combine(binPath, "Logs");
-            var path = Path.Combine(expectedDirectory, filename); 
-            using (FileStream fileStream = File.OpenWrite(path))
+            if (!Directory.Exists(@"Logs"))
+            { Directory.CreateDirectory("Logs"); }
+            if (textBoxVin.TextLength == 17)
+            {
+                if (!Directory.Exists(@"Logs"))
+                { Directory.CreateDirectory("Logs"); }
+                string path = @"Logs\Log-" + textBoxVin.Text + ".txt";
+                if (!File.Exists(path))
                 {
-                    var text = richTextBoxLog.Text;
-                    var content = Encoding.UTF8.GetBytes(text);
-                    fileStream.Write(content, 0, content.Length);
+                    using (StreamWriter sw = File.CreateText(path))
+                    {
+                        sw.WriteLine("Log");
+                    }
                 }
+                else if (File.Exists(path))
+                {
+                    using (StreamWriter sw = File.AppendText(path))
+                    {
+                        for (int i = 0; i < richTextBoxLog.Lines.Length; i++)
+                        {
+                            sw.WriteLine(richTextBoxLog.Lines[i]);
+                        }
+                        sw.Flush();
+                        sw.Close();
+                    }
+                }
+            }
+            else
+            {
+                string path = @"Logs\Log.txt";
+                if (!File.Exists(path))
+                {
+                    using (StreamWriter sw = File.CreateText(path))
+                    {
+                        for (int i = 0; i < richTextBoxLog.Lines.Length; i++)
+                        {
+                            sw.WriteLine(richTextBoxLog.Lines[i]);
+                        }
+                        sw.Flush();
+                        sw.Close();
+                    }
+                }
+                else if (File.Exists(path))
+                {
+                    using (StreamWriter sw = File.AppendText(path))
+                    {
+                        for (int i = 0; i < richTextBoxLog.Lines.Length; i++)
+                        {
+                            sw.WriteLine(richTextBoxLog.Lines[i]);
+                        }
+                        sw.Flush();
+                        sw.Close();
+                    }
+                }
+            }
         }
     }
 }

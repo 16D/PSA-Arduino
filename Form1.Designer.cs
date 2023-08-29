@@ -239,7 +239,6 @@ namespace PSA_CVM2
             this.richTextBoxLog.HideSelection = false;
             this.richTextBoxLog.Location = new System.Drawing.Point(0, 117);
             this.richTextBoxLog.Name = "richTextBoxLog";
-            this.richTextBoxLog.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
             this.richTextBoxLog.Size = new System.Drawing.Size(513, 315);
             this.richTextBoxLog.TabIndex = 8;
             this.richTextBoxLog.Text = "";
