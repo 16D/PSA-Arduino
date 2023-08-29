@@ -323,15 +323,7 @@ namespace PSA_CVM2
         public void ButtonIdentifyBSI_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(BSI);
-            //spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
-            //Thread.Sleep(1500);
-            //string odebraneBSIZI = serialData;
-            //richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneBSIZI + Environment.NewLine;
             string odebraneBSIZI = ReadZoneUDS("F0FE");
-            //spArduino.WriteLine(String.Format("22F080"));
-            //Thread.Sleep(1500);
-            //string odebraneBSIZA = serialData;
-            //richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneBSIZA + Environment.NewLine;
             string odebraneBSIZA = ReadZoneUDS("F080");
             string Ref = odebraneBSIZI.Substring(48, 6);
             textBoxSWBSI.Text = "96" + Ref + "80";
@@ -437,14 +429,8 @@ namespace PSA_CVM2
         public void ButtonIdentifyCVM_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(CVM);
-            spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
-            Thread.Sleep(1500);
-            string odebraneCVMZI = serialData;
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneCVMZI + Environment.NewLine;
-            spArduino.WriteLine(String.Format("22F080"));  //  wysyłamy polecenie CAN do odczytu strefy               
-            Thread.Sleep(1500);
-            string odebraneCVMZA = serialData;
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneCVMZA + Environment.NewLine;
+            string odebraneCVMZI = ReadZoneUDS("F0FE");
+            string odebraneCVMZA = ReadZoneUDS("F080"); 
             string Ref = odebraneCVMZI.Substring(48, 6);
             textBoxSWCVM.Text = "96" + Ref + "80";
             textBoxHWCVM.Text = odebraneCVMZA.Substring(20, 10);
@@ -568,14 +554,8 @@ namespace PSA_CVM2
         public void ButtonIdentifyAAS_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(AAS);
-            spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
-            Thread.Sleep(1500);
-            string odebraneAASZI = serialData;
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneAASZI + Environment.NewLine;
-            spArduino.WriteLine(String.Format("22F080"));  //  wysyłamy polecenie CAN do odczytu strefy               
-            Thread.Sleep(1500);
-            string odebraneAASZA = serialData;
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneAASZA;
+            string odebraneAASZI = ReadZoneUDS("F0FE");
+            string odebraneAASZA = ReadZoneUDS("F080"); 
             string[] Ref = { odebraneAASZI.Substring(48, 6) };
             textBoxSWAAS.Text = "96" + Ref[0] + "80";
             textBoxHWAAS.Text = odebraneAASZA.Substring(20, 10);
@@ -620,14 +600,8 @@ namespace PSA_CVM2
         private void ButtonIdentifyARTIV_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(ARTIV);
-            spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
-            Thread.Sleep(1500);
-            string odebraneARTIVZI = serialData;
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneARTIVZI + Environment.NewLine;
-            spArduino.WriteLine(String.Format("22F080"));  //  wysyłamy polecenie CAN do odczytu strefy               
-            Thread.Sleep(1500);
-            string odebraneARTIVZA = serialData;
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneARTIVZA + Environment.NewLine;
+            string odebraneARTIVZI = ReadZoneUDS("F0FE");
+            string odebraneARTIVZA = ReadZoneUDS("F080"); 
             string Ref = odebraneARTIVZI.Substring(48, 6);
             textBoxSWARTIV.Text = "96" + Ref + "80";
             textBoxHWARTIV.Text = odebraneARTIVZA.Substring(20, 10);
@@ -640,27 +614,21 @@ namespace PSA_CVM2
                 //string CodingKeyARTIV = "xxxx";
                 UnlockCodingARTIV();
             }
-            if (typartiv == "153")
+            else if (typartiv == "153")
             {
                 textBoxTypARTIV.Text = "RADAR_AV_4";
                 UnlockCodingARTIV();
             }
-            //else
-            //{
-            //    textBoxTypARTIV.Text = "Unknown " + typartiv;
-            //}  
+            else
+            {
+                textBoxTypARTIV.Text = "Unknown " + typartiv;
+            }  
         }
         private void ButtonIdentifyCOMBINE_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(COMBINE);
-            spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
-            Thread.Sleep(1500);
-            string odebraneCOMBINEZI = serialData;
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneCOMBINEZI + Environment.NewLine;
-            spArduino.WriteLine(String.Format("22F080"));  //  wysyłamy polecenie CAN do odczytu strefy               
-            Thread.Sleep(1500);
-            string odebraneCOMBINEZA = serialData;
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneCOMBINEZA + Environment.NewLine;
+            string odebraneCOMBINEZI = ReadZoneUDS("F0FE");
+            string odebraneCOMBINEZA = ReadZoneUDS("F080"); 
             string Ref = odebraneCOMBINEZI.Substring(48, 6);
             textBoxSWCOMBINE.Text = "96" + Ref + "80";
             textBoxHWCOMBINE.Text = odebraneCOMBINEZA.Substring(20, 10);
@@ -683,14 +651,8 @@ namespace PSA_CVM2
         private void ButtonIdentifyTELEMAT_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(TELEMAT);
-            spArduino.WriteLine(String.Format("22F0FE"));  //  wysyłamy polecenie CAN do odczytu strefy               
-            Thread.Sleep(1500);
-            string odebraneTELEMATZI = serialData;
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneTELEMATZI + Environment.NewLine;
-            spArduino.WriteLine(String.Format("22F080"));  //  wysyłamy polecenie CAN do odczytu strefy               
-            Thread.Sleep(1500);
-            string odebraneTELEMATZA = serialData;
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebraneTELEMATZA + Environment.NewLine;
+            string odebraneTELEMATZI = ReadZoneUDS("F0FE");
+            string odebraneTELEMATZA = ReadZoneUDS("F080");
             string Ref = odebraneTELEMATZI.Substring(48, 6);
             textBoxSWTELEMAT.Text = "96" + Ref + "80";
             textBoxHWTELEMAT.Text = odebraneTELEMATZA.Substring(20, 10);
@@ -772,14 +734,10 @@ namespace PSA_CVM2
             var path = Path.Combine(expectedDirectory, filename); 
             using (FileStream fileStream = File.OpenWrite(path))
                 {
-                    var text = Environment.NewLine + richTextBoxLog.Text;
+                    var text = richTextBoxLog.Text;
                     var content = Encoding.UTF8.GetBytes(text);
                     fileStream.Write(content, 0, content.Length);
                 }
         }
-    }
-    public partial class Algorithm
-    {
-
     }
 }
