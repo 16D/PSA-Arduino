@@ -474,21 +474,11 @@ namespace PSA_CVM2
         }
         public void ButtonReadCodingDAE_Click(object sender, EventArgs e)
         {
-                spArduino.WriteLine(String.Format("1001"));
-                Thread.Sleep(100);
-                spArduino.WriteLine(String.Format(DAE));
-                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(DAE) + Environment.NewLine;
-                Thread.Sleep(100);
-                spArduino.WriteLine(String.Format("81"));
-                richTextBoxLog.Text += DateTime.Now.ToString() + String.Format("> 81") + Environment.NewLine;
-                Thread.Sleep(100);
-                string odebrane = ReadZoneKWP("A0");
-                richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane + Environment.NewLine;
-
+            ConnectModuleKWP(DAE);
+            string odebrane = ReadZoneKWP("A0");
             string toRemove4 = String.Format("61A0");
-            string CodingDAE;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
             int s2 = odebrane.IndexOf(toRemove4);                                          // Zapis string.Empty lub string = ""; to to samo
-            CodingDAE = odebrane.Remove(s2, toRemove4.Length);
+            string CodingDAE = odebrane.Remove(s2, toRemove4.Length);
             textBoxDAECoding.Text = CodingDAE;
         }
         public void ButtonWriteCodingDAE_Click(object sender, EventArgs e)
