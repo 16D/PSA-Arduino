@@ -23,7 +23,6 @@ namespace PSA_CVM2
     public partial class Form1 : Form
     { 
         public string serialData;
-        public string odebrane;
         public string BSI = ">752:652";
         public string CodingKeyBSI;
         public string CVM = ">74A:64A";
@@ -35,7 +34,6 @@ namespace PSA_CVM2
         public string ARTIV = ">6B6:696";
         public string TELEMAT = ">764:664";
         public string COMBINE = ">75F:65F";
-        public string resultCodingCVM;
 
         public Form1()
         {
@@ -110,6 +108,7 @@ namespace PSA_CVM2
         public void SpArduino_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
             serialData = spArduino.ReadLine();
+            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + serialData + Environment.NewLine;
         }
         private void ButtonClearLog_Click(object sender, EventArgs e)
         {
@@ -263,7 +262,6 @@ namespace PSA_CVM2
         }
         private void ConnectModuleUDS(string type)
         {
-            string odpowiedz = string.Empty;
             spArduino.WriteLine(String.Format("1001"));
             richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1001") + Environment.NewLine;
             Thread.Sleep(100);
@@ -273,12 +271,11 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("1003"));
             richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 1003") + Environment.NewLine;
             Thread.Sleep(500);
-            odpowiedz = serialData;
+            string odpowiedz = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString() + " < " + String.Format(odpowiedz) + Environment.NewLine;
         }
         private void ConnectModuleKWP(string type)
         {
-            string odpowiedz = string.Empty;
             spArduino.WriteLine(String.Format("1001"));
             richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 1001") + Environment.NewLine;
             Thread.Sleep(100);
@@ -288,7 +285,7 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("81"));
             richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 81") + Environment.NewLine;
             Thread.Sleep(500);
-            odpowiedz = serialData;
+            string odpowiedz = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString() + " < " + String.Format(odpowiedz) + Environment.NewLine;
         }
         public string ReadZoneUDS(string zone)
@@ -300,11 +297,14 @@ namespace PSA_CVM2
             richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odpowiedz + Environment.NewLine;
             return odpowiedz;
         }
-        public void ReadZoneKWP(string zone)
+        public string ReadZoneKWP(string zone)
         {
             spArduino.WriteLine("21" + zone);
-            Thread.Sleep(1500);
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " > 21" + zone + Environment.NewLine;
+            Thread.Sleep(1000);
             string odpowiedz = serialData;
+            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odpowiedz + Environment.NewLine;
+            return odpowiedz;
         }
         public void ButtonIdentifyBSI_Click(object sender, EventArgs e)
         {
@@ -317,7 +317,7 @@ namespace PSA_CVM2
             string typbsi = odebraneBSIZI.Substring(14, 4);// wydobycie z ciągu sekcji 4 bajtów typu modułu z odebranych danych
             textBoxTypBSI.Text = typbsi;
             if (typbsi == "13B3")
-                {                                              // warunek przypisania typu modułu do kodu Bajtowego
+                {                                          // warunek przypisania typu modułu do kodu Bajtowego
                     textBoxTypBSI.Text = "DELPHI";
                     CodingKeyBSI = "B4E0";
                     UnlockCodingBSI();
@@ -339,36 +339,38 @@ namespace PSA_CVM2
         }
         public void ButtonReadCodingBSI_Click(object sender, EventArgs e)
         {
-            spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
-            richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 1003") + Environment.NewLine; 
-            Thread.Sleep(100);
-            spArduino.WriteLine(String.Format("22" + textBoxZone.Text));                    // Odczyt kodowania zony 2326
-            richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 22" + textBoxZone.Text) + Environment.NewLine; 
-            Thread.Sleep(100);
-            string odebrane3 = serialData;                                               // odebranie danych
-            richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" < " + odebrane3) + Environment.NewLine;
-
-            string toRemove = "62" + textBoxZone.Text;
-            string result2 = string.Empty;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
-            int s = odebrane3.IndexOf(toRemove);                                          // Zapis string.Empty lub string = ""; to to samo
-            if (s >= 0)
+            if (textBoxZone.Text != "")
             {
-                result2 = odebrane3.Remove(s, toRemove.Length);
+                spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
+                richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 1003") + Environment.NewLine;
+                Thread.Sleep(100);
+                string odebrane3 = ReadZoneUDS(textBoxZone.Text);
+                string toRemove = "62" + textBoxZone.Text;
+                string result2 = string.Empty;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
+                int s = odebrane3.IndexOf(toRemove);                                          // Zapis string.Empty lub string = ""; to to samo
+                if (s >= 0)
+                {
+                    result2 = odebrane3.Remove(s, toRemove.Length);
+                }
+                textBoxCoding.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
+
+                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
+                Thread.Sleep(100);
+
+
+                if (textBoxCoding.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
+                {
+                    textBoxInfo.Text = "No coding in this zone";
+                }
             }
-            textBoxCoding.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
-
-            spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
-            Thread.Sleep(100);
-
-
-            if (textBoxCoding.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
-            {
-                textBoxInfo.Text = "KODOWANIE STREFY NIE WYSTEPUJE W TYM BSI";
-            }
+            else
+                {
+                textBoxInfo.Text = "Please select zone";
+                }
         }
-        public void buttonWriteCodingBSI_Click(object sender, EventArgs e)
+        public void ButtonWriteCodingBSI_Click(object sender, EventArgs e)
         {
-            if (textBoxNewCoding.Text == "")
+            if (textBoxNewCoding.Text != "")
                 {
                 textBoxInfo.Text = "New coding not written";
                 }    
@@ -441,92 +443,83 @@ namespace PSA_CVM2
         }
         private void ButtonReadCodingCVM_Click(object sender, EventArgs e)
         {
-            //string odebraneCodingCVM = serialData;
             if (textBoxTypCVM.Text == "CVM_2")
             {
-                spArduino.WriteLine(String.Format("222100"));  //  wysyłamy polecenie CAN do odczytu strefy               
-                Thread.Sleep(1500);
-                string odebraneCodingCVM = serialData;
-                richTextBoxLog.Text += odebraneCodingCVM + Environment.NewLine;
+                string odebraneCodingCVM = ReadZoneUDS("2100"); 
                 string toRemove3 = String.Format("622100");
                 int s2 = odebraneCodingCVM.IndexOf(toRemove3);
-                resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
+                string resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
+                textBoxCVMCoding.Text = resultCodingCVM;
             }
-            if (textBoxTypCVM.Text == "CVM_3")
+            else if (textBoxTypCVM.Text == "CVM_3")
             {
-                spArduino.WriteLine(String.Format("222101"));  //  wysyłamy polecenie CAN do odczytu strefy               
-                Thread.Sleep(1500);
-                string odebraneCodingCVM = serialData;
-                richTextBoxLog.Text += odebraneCodingCVM + Environment.NewLine;
+                string odebraneCodingCVM = ReadZoneUDS("2101"); 
                 string toRemove3 = String.Format("622101");
                 int s2 = odebraneCodingCVM.IndexOf(toRemove3);
-                resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
+                string resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
+                textBoxCVMCoding.Text = resultCodingCVM;
             }
-            textBoxCVMCoding.Text = resultCodingCVM;                                                     // wyświetlenie wartości kodowania w textbox
             spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
             Thread.Sleep(100);
         }
-        private void ButtonIdentifyDAE_Click(object sender, EventArgs e)
+        public void ButtonIdentifyDAE_Click(object sender, EventArgs e)
         {
-            string odpowiedz = string.Empty; 
-            spArduino.WriteLine(String.Format("1001"));
-            Thread.Sleep(10);
-            spArduino.WriteLine(String.Format(DAE));
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " " + String.Format(DAE) + Environment.NewLine;
-            Thread.Sleep(100);
-            spArduino.WriteLine(String.Format("81"));
-            richTextBoxLog.Text += DateTime.Now.ToString() + " > 81" + Environment.NewLine;
-            Thread.Sleep(100);
-            odpowiedz = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + String.Format(odpowiedz) + Environment.NewLine;
-            spArduino.WriteLine(String.Format("21FE"));
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 21FE") + Environment.NewLine;
-            Thread.Sleep(100);
-            string odebraneDAEZI = serialData;
-            richTextBoxLog.Text += DateTime.Now.ToString() + " > " + odebraneDAEZI + Environment.NewLine;
-            spArduino.WriteLine(String.Format("2180"));
-            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 2180") + Environment.NewLine;
-            Thread.Sleep(100);
-            string odebraneDAEZA = serialData;                                
-            richTextBoxLog.Text += DateTime.Now.ToString() + " > " + odebraneDAEZA + Environment.NewLine;
+            ConnectModuleKWP(DAE);
+            string odebraneDAEZI = ReadZoneKWP("FE");
+            string odebraneDAEZA = ReadZoneKWP("80");                                
             string Ref = odebraneDAEZI.Substring(46, 6);
             textBoxSWDAE.Text = "96" + Ref + "80";
             UnlockCodingDAE();
-            //string KeyCodingDAE = 2305;
+            string CodingKeyDAE = "2305";
         }
         public void ButtonReadCodingDAE_Click(object sender, EventArgs e)
         {
-        
                 spArduino.WriteLine(String.Format("1001"));
                 Thread.Sleep(100);
                 spArduino.WriteLine(String.Format(DAE));
-                richTextBoxLog.Text += String.Format(DAE) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(DAE) + Environment.NewLine;
                 Thread.Sleep(100);
                 spArduino.WriteLine(String.Format("81"));
-                richTextBoxLog.Text += String.Format("> 81") + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + String.Format("> 81") + Environment.NewLine;
                 Thread.Sleep(100);
-                spArduino.WriteLine(String.Format("21A0"));
-                Thread.Sleep(500);
-                string odebrane8 = serialData;
-                richTextBoxLog.Text += odebrane8 + Environment.NewLine;
+                string odebrane = ReadZoneKWP("A0");
+                richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane + Environment.NewLine;
 
             string toRemove4 = String.Format("61A0");
             string CodingDAE;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
-            int s2 = odebrane8.IndexOf(toRemove4);                                          // Zapis string.Empty lub string = ""; to to samo
-            CodingDAE = odebrane8.Remove(s2, toRemove4.Length);
+            int s2 = odebrane.IndexOf(toRemove4);                                          // Zapis string.Empty lub string = ""; to to samo
+            CodingDAE = odebrane.Remove(s2, toRemove4.Length);
             textBoxDAECoding.Text = CodingDAE;
         }
-        public void buttonWriteCodingDAE_Click(object sender, EventArgs e)
+        public void ButtonWriteCodingDAE_Click(object sender, EventArgs e)
         {
+            spArduino.WriteLine(String.Format("81"));
+            richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 81") + Environment.NewLine;
+            Thread.Sleep(500);
             // wyslac           2783
+            spArduino.WriteLine(String.Format("2783"));  //  wysyłamy polecenie CAN do odczytu strefy
+            richTextBoxLog.Text += DateTime.Now.ToString() + " > 2783" + Environment.NewLine;
+            Thread.Sleep(500);
+            string odebrane = serialData;
+            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane + Environment.NewLine;
             //odebrac           6783xxxxxxxx
+            string Seed = odebrane.Substring(4, 8);
+            richTextBoxLog.Text += DateTime.Now.ToString() + " Seed:" + Seed + Environment.NewLine;
+            richTextBoxLog.Text += DateTime.Now.ToString() + " Key:" + CodingKeyDAE + Environment.NewLine;
             //  wyliczyc seedkey
+            string SeedKey = getKey(Seed, CodingKeyDAE);
+            richTextBoxLog.Text += DateTime.Now.ToString() + " " + SeedKey + Environment.NewLine;
             // wyslac 2784+seedkey
+            //spArduino.WriteLine(String.Format("2784" + SeedKey));
+            richTextBoxLog.Text += DateTime.Now.ToString() + " > 2784" + SeedKey + Environment.NewLine;
+            //Thread.Sleep(500);
             // oderac 6784
+            //string odebrane1 = serialData;
+            //richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane1 + Environment.NewLine;
             // wyslac kodowanie 34A0 z kodowaniem
 
             /*
-            string str = "34A00000000605CCFD000000";
+            string str = "34A00000000605D8FD000000";
             byte[] BTS = StringToByteArray(str);
             ushort calc_crc = crc16_x25(BTS, BTS.Length);
 
@@ -546,7 +539,6 @@ namespace PSA_CVM2
             textBoxSWAAS.Text = "96" + Ref[0] + "80";
             textBoxHWAAS.Text = odebraneAASZA.Substring(20, 10);
             string typAAS = odebraneAASZI.Substring(14, 4);                                           // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
-            richTextBoxLog.Text += typAAS + Environment.NewLine;
             textBoxTypAAS.Text = typAAS;
             //if (typAAS == "xxxx")
             //{
@@ -557,7 +549,7 @@ namespace PSA_CVM2
             if (typAAS == "03E1")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypAAS.Text = "AAS_UDS_G5";
-//                string CodingKeyAAS = "D1F5";
+                string CodingKeyAAS = "D1F5";
                 UnlockCodingAAS();
             }
             else if (typAAS == "06E0")
@@ -573,14 +565,10 @@ namespace PSA_CVM2
         }
         private void ButtonReadCodingAAS_Click(object sender, EventArgs e)
         {
-            spArduino.WriteLine(String.Format("222101"));  //  wysyłamy polecenie CAN do odczytu strefy               
-            Thread.Sleep(1500);
-            string odebraneCodingAAS = serialData;
-            richTextBoxLog.Text += odebraneCodingAAS + Environment.NewLine;
+            string odebraneCodingAAS = ReadZoneUDS("2101"); 
             string toRemove3 = String.Format("622101");
-            string resultCodingAAS;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
             int s2 = odebraneCodingAAS.IndexOf(toRemove3);                                          // Zapis string.Empty lub string = ""; to to samo
-            resultCodingAAS = odebraneCodingAAS.Remove(s2, toRemove3.Length);
+            string resultCodingAAS = odebraneCodingAAS.Remove(s2, toRemove3.Length);
             textBoxCodingAAS.Text = resultCodingAAS;                                                     // wyświetlenie wartości kodowania w textbox
         }
         private void ButtonIdentifyARTIV_Click(object sender, EventArgs e)
@@ -712,7 +700,7 @@ namespace PSA_CVM2
             string SeedKey = getKey(Seed, Key);
             richTextBoxLog.Text += DateTime.Now.ToString() +" " + SeedKey + Environment.NewLine;
         }
-        private void buttonSaveLog_Click(object sender, EventArgs e)
+        private void ButtonSaveLog_Click(object sender, EventArgs e)
         {
             if (!Directory.Exists(@"Logs"))
             { Directory.CreateDirectory("Logs"); }
