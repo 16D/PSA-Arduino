@@ -32,9 +32,8 @@ namespace PSA_CVM2
         public string AAS = ">75D:65D";
         public string CodingKeyAAS;
         public string ARTIV = ">6B6:696";
-        public string TELEMAT = ">764:664";
         public string COMBINE = ">75F:65F";
-
+        public string TELEMAT = ">764:664";
         public Form1()
         {
             InitializeComponent();
@@ -108,7 +107,6 @@ namespace PSA_CVM2
         public void SpArduino_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
             serialData = spArduino.ReadLine();
-            richTextBoxLog.Text += DateTime.Now.ToString() + " < " + serialData + Environment.NewLine;
         }
         private void ButtonClearLog_Click(object sender, EventArgs e)
         {
@@ -292,7 +290,7 @@ namespace PSA_CVM2
         {
             spArduino.WriteLine("22" + zone);
             richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " > 22" + zone + Environment.NewLine;
-            Thread.Sleep(1000);
+            Thread.Sleep(1500);
             string odpowiedz = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odpowiedz + Environment.NewLine;
             return odpowiedz;
@@ -342,7 +340,7 @@ namespace PSA_CVM2
             if (textBoxZone.Text != "")
             {
                 spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
-                richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 1003") + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1003");
                 Thread.Sleep(100);
                 string odebrane3 = ReadZoneUDS(textBoxZone.Text);
                 string toRemove = "62" + textBoxZone.Text;
@@ -395,7 +393,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + " Seed:" + Seed + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + " Key:" + CodingKeyBSI + Environment.NewLine;
                 // wygenerowc seedkey
-                string SeedKey = getKey(Seed, CodingKeyBSI);
+                string SeedKey = GetKey(Seed, CodingKeyBSI);
                 richTextBoxLog.Text += DateTime.Now.ToString() + " < " + SeedKey + Environment.NewLine;
                 // wyslac 2704xxxxxxxx
                 spArduino.WriteLine(String.Format("2704" + SeedKey));
@@ -466,7 +464,7 @@ namespace PSA_CVM2
         {
             ConnectModuleKWP(DAE);
             string odebraneDAEZI = ReadZoneKWP("FE");
-            string odebraneDAEZA = ReadZoneKWP("80");                                
+//            string odebraneDAEZA = ReadZoneKWP("80");                                
             string Ref = odebraneDAEZI.Substring(46, 6);
             textBoxSWDAE.Text = "96" + Ref + "80";
             UnlockCodingDAE();
@@ -497,7 +495,7 @@ namespace PSA_CVM2
             richTextBoxLog.Text += DateTime.Now.ToString() + " Seed:" + Seed + Environment.NewLine;
             richTextBoxLog.Text += DateTime.Now.ToString() + " Key:" + CodingKeyDAE + Environment.NewLine;
             //  wyliczyc seedkey
-            string SeedKey = getKey(Seed, CodingKeyDAE);
+            string SeedKey = GetKey(Seed, CodingKeyDAE);
             richTextBoxLog.Text += DateTime.Now.ToString() + " " + SeedKey + Environment.NewLine;
             // wyslac 2784+seedkey
             //spArduino.WriteLine(String.Format("2784" + SeedKey));
@@ -528,7 +526,7 @@ namespace PSA_CVM2
             string[] Ref = { odebraneAASZI.Substring(48, 6) };
             textBoxSWAAS.Text = "96" + Ref[0] + "80";
             textBoxHWAAS.Text = odebraneAASZA.Substring(20, 10);
-            string typAAS = odebraneAASZI.Substring(14, 4);                                           // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
+            string typAAS = odebraneAASZA.Substring(46, 4);                                          // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
             textBoxTypAAS.Text = typAAS;
             //if (typAAS == "xxxx")
             //{
@@ -536,13 +534,19 @@ namespace PSA_CVM2
             //    string CodingKeyAAS = "0000";
             //    UnlockCodingAAS();
             //}
-            if (typAAS == "03E1")
-            {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
+            if (typAAS == "2199")
+            {
                 textBoxTypAAS.Text = "AAS_UDS_G5";
+//                string CodingKeyAAS = "0000";
+                UnlockCodingAAS();
+            }
+            else if (typAAS == "8199")
+            {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
+                textBoxTypAAS.Text = "CPK_UDS_G5";
                 string CodingKeyAAS = "D1F5";
                 UnlockCodingAAS();
             }
-            else if (typAAS == "06E0")
+            else if (typAAS == "FFFF")
             {
                 textBoxTypAAS.Text = "AAS_UDS_G6";
  //               string CodingKeyAAS = "B6F0";
@@ -555,11 +559,25 @@ namespace PSA_CVM2
         }
         private void ButtonReadCodingAAS_Click(object sender, EventArgs e)
         {
-            string odebraneCodingAAS = ReadZoneUDS("2101"); 
-            string toRemove3 = String.Format("622101");
-            int s2 = odebraneCodingAAS.IndexOf(toRemove3);                                          // Zapis string.Empty lub string = ""; to to samo
-            string resultCodingAAS = odebraneCodingAAS.Remove(s2, toRemove3.Length);
-            textBoxCodingAAS.Text = resultCodingAAS;                                                     // wyświetlenie wartości kodowania w textbox
+
+            if (textBoxTypCVM.Text == "AAS_UDS_G5")
+            {
+                string odebraneCodingAAS = ReadZoneUDS("2100");
+                string toRemove3 = String.Format("622100");
+                int s2 = odebraneCodingAAS.IndexOf(toRemove3);
+                string resultCodingAAS = odebraneCodingAAS.Remove(s2, toRemove3.Length);
+                textBoxCodingAAS.Text = resultCodingAAS;
+            }
+            else if (textBoxTypCVM.Text == "CPK_UDS_G5")
+            {
+                string odebraneCodingAAS = ReadZoneUDS("2101");
+                string toRemove3 = String.Format("622101");
+                int s2 = odebraneCodingAAS.IndexOf(toRemove3);
+                string resultCodingAAS = odebraneCodingAAS.Remove(s2, toRemove3.Length);
+                textBoxCodingAAS.Text = resultCodingAAS;
+            }
+            spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
+            Thread.Sleep(100); 
         }
         private void ButtonIdentifyARTIV_Click(object sender, EventArgs e)
         {
@@ -636,7 +654,7 @@ namespace PSA_CVM2
                 textBoxTypTELEMAT.Text = "Unknown " + typtelemat;
             }
         }
-        ushort crc16_x25(byte[] data, int len)
+        ushort Crc16_x25(byte[] data, int len)
         {
             ushort crc = 0xffff;
             for (ushort i = 0; i < len; i++)
@@ -659,14 +677,14 @@ namespace PSA_CVM2
                 bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
             return bytes;
         }
-        public static Int32 transform(int data, int[] sec)
+        public static Int32 Transform(int data, int[] sec)
         {
             Int32 result = ((data % sec[0]) * sec[2]) - ((data / sec[0]) * sec[1]);
             if (result < 0)
                 result += (sec[0] * sec[2]) + sec[1];
             return result;
         }
-        public static string getKey(string seedTXT, string appKeyTXT)
+        public static string GetKey(string seedTXT, string appKeyTXT)
         {
             Int32 result;
 
@@ -678,8 +696,8 @@ namespace PSA_CVM2
             int[] sec_2 = { 0xB1, 0x02, 0xAB };
 
             // Compute each 16b part of the response, with the twist, and return it
-            Int32 res_msb = transform(Int16.Parse(appKey[0] + appKey[1], System.Globalization.NumberStyles.HexNumber), sec_1) | transform(Int16.Parse(seed[0] + seed[3], System.Globalization.NumberStyles.HexNumber), sec_2);
-            Int32 res_lsb = transform(Int16.Parse(seed[1] + seed[2], System.Globalization.NumberStyles.HexNumber), sec_1) | transform(res_msb, sec_2);
+            Int32 res_msb = Transform(Int16.Parse(appKey[0] + appKey[1], System.Globalization.NumberStyles.HexNumber), sec_1) | Transform(Int16.Parse(seed[0] + seed[3], System.Globalization.NumberStyles.HexNumber), sec_2);
+            Int32 res_lsb = Transform(Int16.Parse(seed[1] + seed[2], System.Globalization.NumberStyles.HexNumber), sec_1) | Transform(res_msb, sec_2);
             result = (res_msb << 16) | res_lsb;
             return result.ToString("X8");
         }
@@ -687,7 +705,7 @@ namespace PSA_CVM2
         {
             string Key = textBoxKey.Text;
             string Seed = textBoxSeed.Text;
-            string SeedKey = getKey(Seed, Key);
+            string SeedKey = GetKey(Seed, Key);
             richTextBoxLog.Text += DateTime.Now.ToString() +" " + SeedKey + Environment.NewLine;
         }
         private void ButtonSaveLog_Click(object sender, EventArgs e)

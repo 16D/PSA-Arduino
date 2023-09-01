@@ -508,7 +508,7 @@ namespace PSA_CVM2
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(423, 437);
+            this.tabPage2.Size = new System.Drawing.Size(431, 437);
             this.tabPage2.TabIndex = 2;
             this.tabPage2.Text = "CVM";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -615,7 +615,7 @@ namespace PSA_CVM2
             this.tabPage3.Location = new System.Drawing.Point(4, 25);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(423, 437);
+            this.tabPage3.Size = new System.Drawing.Size(431, 437);
             this.tabPage3.TabIndex = 3;
             this.tabPage3.Text = "DAE";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -723,7 +723,7 @@ namespace PSA_CVM2
             this.tabPage4.Location = new System.Drawing.Point(4, 25);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(423, 437);
+            this.tabPage4.Size = new System.Drawing.Size(431, 437);
             this.tabPage4.TabIndex = 4;
             this.tabPage4.Text = "AAS";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -830,7 +830,7 @@ namespace PSA_CVM2
             this.tabPage5.Location = new System.Drawing.Point(4, 25);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(423, 437);
+            this.tabPage5.Size = new System.Drawing.Size(431, 437);
             this.tabPage5.TabIndex = 5;
             this.tabPage5.Text = "ARTIV";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -933,7 +933,7 @@ namespace PSA_CVM2
             this.tabPage6.Location = new System.Drawing.Point(4, 25);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(423, 437);
+            this.tabPage6.Size = new System.Drawing.Size(431, 437);
             this.tabPage6.TabIndex = 6;
             this.tabPage6.Text = "COMBINE";
             this.tabPage6.UseVisualStyleBackColor = true;
@@ -1009,7 +1009,7 @@ namespace PSA_CVM2
             this.tabPage7.Location = new System.Drawing.Point(4, 25);
             this.tabPage7.Name = "tabPage7";
             this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage7.Size = new System.Drawing.Size(423, 437);
+            this.tabPage7.Size = new System.Drawing.Size(431, 437);
             this.tabPage7.TabIndex = 7;
             this.tabPage7.Text = "TELEMAT";
             this.tabPage7.UseVisualStyleBackColor = true;
@@ -1082,7 +1082,7 @@ namespace PSA_CVM2
             this.Controls.Add(this.textBoxInfo);
             this.Controls.Add(this.panel1);
             this.Name = "Form1";
-            this.Text = "PSA Arduino 31.08.23";
+            this.Text = "PSA Arduino 01.09.23";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.tabControl1.ResumeLayout(false);
