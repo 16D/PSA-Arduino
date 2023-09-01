@@ -142,7 +142,6 @@ namespace PSA_CVM2
         }
         public void Vinbsi()
         {
-            textBoxVin.Clear();
             string zone = "F190";
             string odebraneVIN = ReadZoneUDS(zone);
             string toRemove = "62F190";                                                                  // procedura usuwania polecania CAN z ciagu danych do wyświetlenia VIN
