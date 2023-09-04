@@ -130,7 +130,8 @@
 2105 Secured configuration settings data values
 2106 Secured configuration settings group data list 2
 2326 High Beam Assist                    00=without/01=with
-2373 Lane Assist                               02=alarm/0A=Lane Assist
+2348 CCS/ACC
+2373 Lane Assist                               02=alarm/08=?0A=Lane Assist
 2437 Wireless Charger presence
 D400 Present groups list?
 </value>

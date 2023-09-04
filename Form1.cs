@@ -274,7 +274,7 @@ namespace PSA_CVM2
         private void ConnectModuleKWP(string type)
         {
             spArduino.WriteLine(String.Format("1001"));
-            richTextBoxLog.Text += DateTime.Now.ToString() + String.Format(" > 1001") + Environment.NewLine;
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1001") + Environment.NewLine;
             Thread.Sleep(100);
             spArduino.WriteLine(String.Format(type));
             richTextBoxLog.Text += DateTime.Now.ToString() + " " + String.Format(type) + Environment.NewLine;
@@ -306,8 +306,8 @@ namespace PSA_CVM2
         public void ButtonIdentifyBSI_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(BSI);
-            string odebraneBSIZI = ReadZoneUDS("F0FE");
             string odebraneBSIZA = ReadZoneUDS("F080");
+            string odebraneBSIZI = ReadZoneUDS("F0FE");
             string Ref = odebraneBSIZI.Substring(48, 6);
             textBoxSWBSI.Text = "96" + Ref + "80";
             textBoxHWBSI.Text = odebraneBSIZA.Substring(20, 10);
@@ -326,12 +326,13 @@ namespace PSA_CVM2
                 }
             else if (typbsi == "0DB3")
                 {
-                    textBoxTypBSI.Text = "2010";
+                    textBoxTypBSI.Text = "CONTINENTAL";
                     UnlockCodingBSI();
                 }
             else
                 {
                     textBoxTypBSI.Text = "Unknown " + typbsi;
+                    UnlockCodingBSI();
                 }
         }
         public void ButtonReadCodingBSI_Click(object sender, EventArgs e)
@@ -411,8 +412,8 @@ namespace PSA_CVM2
         public void ButtonIdentifyCVM_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(CVM);
+            string odebraneCVMZA = ReadZoneUDS("F080");
             string odebraneCVMZI = ReadZoneUDS("F0FE");
-            string odebraneCVMZA = ReadZoneUDS("F080"); 
             string Ref = odebraneCVMZI.Substring(48, 6);
             textBoxSWCVM.Text = "96" + Ref + "80";
             textBoxHWCVM.Text = odebraneCVMZA.Substring(20, 10);
@@ -459,8 +460,8 @@ namespace PSA_CVM2
         public void ButtonIdentifyDAE_Click(object sender, EventArgs e)
         {
             ConnectModuleKWP(DAE);
+            string odebraneDAEZA = ReadZoneKWP("80");
             string odebraneDAEZI = ReadZoneKWP("FE");
-            string odebraneDAEZA = ReadZoneKWP("80");                                
             string Ref = odebraneDAEZI.Substring(46, 6);
             textBoxSWDAE.Text = "96" + Ref + "80";
             UnlockCodingDAE();
@@ -503,7 +504,7 @@ namespace PSA_CVM2
             // wyslac kodowanie 34A0 z kodowaniem
 
             /*
-            string str = "34A00000000605D8FD000000";
+            string str = "34A00000000605" + textBoxNewCoding.Text + "00000000";
             byte[] BTS = StringToByteArray(str);
             ushort calc_crc = crc16_x25(BTS, BTS.Length);
 
@@ -518,8 +519,8 @@ namespace PSA_CVM2
         public void ButtonIdentifyAAS_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(AAS);
+            string odebraneAASZA = ReadZoneUDS("F080");
             string odebraneAASZI = ReadZoneUDS("F0FE");
-            string odebraneAASZA = ReadZoneUDS("F080"); 
             string[] Ref = { odebraneAASZI.Substring(48, 6) };
             textBoxSWAAS.Text = "96" + Ref[0] + "80";
             textBoxHWAAS.Text = odebraneAASZA.Substring(20, 10);
@@ -615,8 +616,8 @@ namespace PSA_CVM2
         private void ButtonIdentifyARTIV_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(ARTIV);
+            string odebraneARTIVZA = ReadZoneUDS("F080");
             string odebraneARTIVZI = ReadZoneUDS("F0FE");
-            string odebraneARTIVZA = ReadZoneUDS("F080"); 
             string Ref = odebraneARTIVZI.Substring(48, 6);
             textBoxSWARTIV.Text = "96" + Ref + "80";
             textBoxHWARTIV.Text = odebraneARTIVZA.Substring(20, 10);
@@ -642,6 +643,14 @@ namespace PSA_CVM2
         }
         private void buttonReadCodingARTIV_Click(object sender, EventArgs e)
         {
+//            if (textBoxTypARTIV.Text == "ARTIV_UDS")
+//            {
+//                string odebraneCodingARTIV = ReadZoneUDS("2101");
+//                string toRemove3 = String.Format("622101");
+//                int s2 = odebraneCodingARTIV.IndexOf(toRemove3);
+//                string resultCodingARTIV = odebraneCodingARTIV.Remove(s2, toRemove3.Length);
+//                textBoxCodingARTIV.Text = resultCodingARTIV;
+//            }
             if (textBoxZoneARTIV.Text != "")
             {
                 spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
@@ -667,12 +676,16 @@ namespace PSA_CVM2
             {
                 textBoxInfo.Text = "Please select zone";
             }
+/*
+                else if (textBoxTypARTIV.Text == "RADAR_AV_4")
+                {
+*/
         }
         private void ButtonIdentifyCOMBINE_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(COMBINE);
+            string odebraneCOMBINEZA = ReadZoneUDS("F080");
             string odebraneCOMBINEZI = ReadZoneUDS("F0FE");
-            string odebraneCOMBINEZA = ReadZoneUDS("F080"); 
             string Ref = odebraneCOMBINEZI.Substring(48, 6);
             textBoxSWCOMBINE.Text = "96" + Ref + "80";
             textBoxHWCOMBINE.Text = odebraneCOMBINEZA.Substring(20, 10);
@@ -695,8 +708,8 @@ namespace PSA_CVM2
         private void ButtonIdentifyTELEMAT_Click(object sender, EventArgs e)
         {
             ConnectModuleUDS(TELEMAT);
-            string odebraneTELEMATZI = ReadZoneUDS("F0FE");
             string odebraneTELEMATZA = ReadZoneUDS("F080");
+            string odebraneTELEMATZI = ReadZoneUDS("F0FE");
             string Ref = odebraneTELEMATZI.Substring(48, 6);
             textBoxSWTELEMAT.Text = "96" + Ref + "80";
             textBoxHWTELEMAT.Text = odebraneTELEMATZA.Substring(20, 10);
@@ -828,7 +841,5 @@ namespace PSA_CVM2
                 }
             }
         }
-
-        
     }
 }
