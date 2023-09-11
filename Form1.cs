@@ -316,22 +316,34 @@ namespace PSA_CVM2
             if (typbsi == "13B3")
                 {                                          // warunek przypisania typu modułu do kodu Bajtowego
                     textBoxTypBSI.Text = "DELPHI";
+                    richTextBoxLog.Text += DateTime.Now.ToString() + "BSI " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
                     CodingKeyBSI = "B4E0";
                     UnlockCodingBSI();
                 }
             else if (typbsi == "06B3")
                 {
                     textBoxTypBSI.Text = "VALEO NOx";
+                    richTextBoxLog.Text += DateTime.Now.ToString() + "BSI " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
                     UnlockCodingBSI();
                 }
             else if (typbsi == "0DB3")
                 {
                     textBoxTypBSI.Text = "CONTINENTAL";
+                    richTextBoxLog.Text += DateTime.Now.ToString() + "BSI " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
                     UnlockCodingBSI();
                 }
             else
                 {
                     textBoxTypBSI.Text = "Unknown " + typbsi;
+                    richTextBoxLog.Text += DateTime.Now.ToString() + "BSI " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
                     UnlockCodingBSI();
                 }
         }
@@ -391,7 +403,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + " Key:" + CodingKeyBSI + Environment.NewLine;
                 // wygenerowc seedkey
                 string SeedKey = GetKey(Seed, CodingKeyBSI);
-                richTextBoxLog.Text += DateTime.Now.ToString() + " < " + SeedKey + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + " Seedkey: " + SeedKey + Environment.NewLine;
                 // wyslac 2704xxxxxxxx
                 spArduino.WriteLine(String.Format("2704" + SeedKey));
                 richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " > 2704" + SeedKey + Environment.NewLine;
@@ -423,17 +435,26 @@ namespace PSA_CVM2
             if (typcvm == "199")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypCVM.Text = "CVM_2";
-//                string CodingKeyCVM = "E2E5";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "CVM: " + string.Format(textBoxTypCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
+                //                string CodingKeyCVM = "E2E5";
                 UnlockCodingCVM();
             }
             else if (typcvm == "179")
             {
                 textBoxTypCVM.Text = "CVM_3";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "CVM: " + string.Format(textBoxTypCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
                 UnlockCodingCVM();
             }
             else
             {
                 textBoxTypCVM.Text = "Unknown " + typcvm;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "CVM: " + string.Format(textBoxTypCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
             }
         }
         private void ButtonReadCodingCVM_Click(object sender, EventArgs e)
@@ -535,28 +556,40 @@ namespace PSA_CVM2
             if (typAAS == "2199")
             {
                 textBoxTypAAS.Text = "AAS_UDS_G5";
-//                string CodingKeyAAS = "0000";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                //                string CodingKeyAAS = "0000";
                 UnlockCodingAAS();
             }
             else if (typAAS == "8199")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypAAS.Text = "CPK_UDS_G5";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
                 string CodingKeyAAS = "D1F5";
                 UnlockCodingAAS();
             }
             else if (typAAS == "FFFF")
             {
                 textBoxTypAAS.Text = "AAS_UDS_G6";
- //               string CodingKeyAAS = "B6F0";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                //               string CodingKeyAAS = "B6F0";
                 UnlockCodingAAS();
             }
             else
             {
                 textBoxTypAAS.Text = "Unknown " + typAAS;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
                 UnlockCodingAAS();
             }
         }
-        private void buttonReadCodingAAS_Click_1(object sender, EventArgs e)
+        private void ButtonReadCodingAAS_Click_1(object sender, EventArgs e)
         {
             if (textBoxZoneAAS.Text != "")
             {
@@ -602,9 +635,8 @@ namespace PSA_CVM2
             }
             else if (textBoxTypAAS.Text == "AAS_UDS_G6")
             {
-                string odebraneCodingAAS = ReadZoneUDS("2100");
-                string odebraneCodingAAS2 = ReadZoneUDS("2101");
-                string toRemove3 = String.Format("622100");
+                string odebraneCodingAAS = ReadZoneUDS("2101");
+                string toRemove3 = String.Format("622101");
                 int s2 = odebraneCodingAAS.IndexOf(toRemove3);
                 string resultCodingAAS = odebraneCodingAAS.Remove(s2, toRemove3.Length);
                 textBoxCodingAAS.Text = resultCodingAAS;
@@ -627,21 +659,30 @@ namespace PSA_CVM2
             if (typartiv == "FFF")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypARTIV.Text = "ARTIV_UDS";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "ARTIV: " + string.Format(textBoxTypARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
                 //string CodingKeyARTIV = "xxxx";
                 UnlockCodingARTIV();
             }
             else if (typartiv == "153")
             {
                 textBoxTypARTIV.Text = "RADAR_AV_4";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "ARTIV: " + string.Format(textBoxTypARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
                 UnlockCodingARTIV();
             }
             else
             {
                 textBoxTypARTIV.Text = "Unknown " + typartiv;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "ARTIV: " + string.Format(textBoxTypARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
                 UnlockCodingARTIV();
             }  
         }
-        private void buttonReadCodingARTIV_Click(object sender, EventArgs e)
+        private void ButtonReadCodingARTIV_Click(object sender, EventArgs e)
         {
 //            if (textBoxTypARTIV.Text == "ARTIV_UDS")
 //            {
@@ -651,7 +692,7 @@ namespace PSA_CVM2
 //                string resultCodingARTIV = odebraneCodingARTIV.Remove(s2, toRemove3.Length);
 //                textBoxCodingARTIV.Text = resultCodingARTIV;
 //            }
-            if (textBoxZoneARTIV.Text != "")
+            if (textBoxZoneARTIV.Text != "RADAR_AV_4")
             {
                 spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
                 richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1003");
@@ -695,14 +736,23 @@ namespace PSA_CVM2
             if (typcombine == "02FC")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypCOMBINE.Text = "CIROCCO";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
             }
             else if (typcombine == "26FC")
             {
                 textBoxTypCOMBINE.Text = "COMBINE_UDS_EV";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
             }
             else
             {
                 textBoxTypCOMBINE.Text = "Unknown " + typcombine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
             }
         }
         private void ButtonIdentifyTELEMAT_Click(object sender, EventArgs e)
@@ -718,15 +768,24 @@ namespace PSA_CVM2
             textBoxTypTELEMAT.Text = typtelemat;
             if (typtelemat == "0DF5")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
-                textBoxTypTELEMAT.Text = "NAC/RCC";
+                textBoxTypTELEMAT.Text = "NAC";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
             }
-            //else if (typtelemat == "xxxx")
-            //{
-            //    textBoxTypTELEMAT.Text = "RADAR_AV_4";
-            //}
+            else if (typtelemat == "03F5")
+            {
+                textBoxTypTELEMAT.Text = "RCC";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "TELEMEAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+            }
             else
             {
                 textBoxTypTELEMAT.Text = "Unknown " + typtelemat;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
             }
         }
         ushort Crc16_x25(byte[] data, int len)
