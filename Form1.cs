@@ -17,6 +17,7 @@ using System.IO.Pipes;
 using System.Windows.Forms.VisualStyles;
 using System.Runtime.InteropServices.ComTypes;
 using System.Net.NetworkInformation;
+using System.Security.Cryptography;
 
 namespace PSA_CVM2
 {
@@ -32,8 +33,12 @@ namespace PSA_CVM2
         public string AAS = ">75D:65D";
         public string CodingKeyAAS;
         public string ARTIV = ">6B6:696";
+        public string CodingKeyARTIV;
         public string COMBINE = ">75F:65F";
+        public string CodingKeyCOMBINE;
         public string TELEMAT = ">764:664";
+        public string CodingKeyTELEMAT;
+
         public Form1()
         {
             InitializeComponent();
@@ -209,22 +214,24 @@ namespace PSA_CVM2
         }
         private void UnlockCodingBSI()
         {
-            buttonReadCodingBSI.Enabled = true;
+            buttonReadZoneBSI.Enabled = true;
             buttonWriteCodingBSI.Enabled = true;
         }
         private void LockCodingBSI()
         {
-            buttonReadCodingBSI.Enabled = false;
+            buttonReadZoneBSI.Enabled = false;
             buttonWriteCodingBSI.Enabled = false;
         }
         private void UnlockCodingCVM()
         {
             buttonReadCodingCVM.Enabled = true;
+            buttonReadZoneCVM.Enabled = true;
             buttonWriteCodingCVM.Enabled = true;
         }
         private void LockCodingCVM()
         {
             buttonReadCodingCVM.Enabled = false;
+            buttonReadZoneCVM.Enabled = false;
             buttonWriteCodingCVM.Enabled = false;
         }
         private void UnlockCodingDAE()
@@ -239,23 +246,27 @@ namespace PSA_CVM2
         }
         private void UnlockCodingAAS()
         {
+            buttonReadZoneAAS.Enabled = true;
             buttonReadCodingAAS.Enabled = true;
-//            buttonWriteCodingAAS.Enabled = true;
+            buttonWriteCodingAAS.Enabled = true;
         }
         private void LockCodingAAS()
         {
+            buttonReadZoneAAS.Enabled = false;
             buttonReadCodingAAS.Enabled = false;
-//            buttonWriteCodingAAS.Enabled = false;
+            buttonWriteCodingAAS.Enabled = false;
         }
         private void UnlockCodingARTIV()
         {
+            buttonReadZoneARTIV.Enabled = true;
             buttonReadCodingARTIV.Enabled = true;
-//            buttonWriteCodingARTIV.Enabled = true;
+            buttonWriteCodingARTIV.Enabled = true;
         }
         private void LockCodingARTIV()
         {
+            buttonReadZoneARTIV.Enabled = false;
             buttonReadCodingARTIV.Enabled = false;
-//            buttonWriteCodingARTIV.Enabled = false;
+            buttonWriteCodingARTIV.Enabled = false;
         }
         private void ConnectModuleUDS(string type)
         {
@@ -347,25 +358,25 @@ namespace PSA_CVM2
                     UnlockCodingBSI();
                 }
         }
-        public void ButtonReadCodingBSI_Click(object sender, EventArgs e)
+        public void ButtonReadZoneBSI_Click(object sender, EventArgs e)
         {
-            if (textBoxZone.Text != "")
+            if (textBoxZoneBSI.Text != "")
             {
                 spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
                 richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1003");
                 Thread.Sleep(100);
-                string odebrane3 = ReadZoneUDS(textBoxZone.Text);
-                string toRemove = "62" + textBoxZone.Text;
+                string odebrane3 = ReadZoneUDS(textBoxZoneBSI.Text);
+                string toRemove = "62" + textBoxZoneBSI.Text;
                 string result2 = string.Empty;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
                 int s = odebrane3.IndexOf(toRemove);                                          // Zapis string.Empty lub string = ""; to to samo
                 if (s >= 0)
                 {
                     result2 = odebrane3.Remove(s, toRemove.Length);
                 }
-                textBoxCoding.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
+                textBoxZoneValueBSI.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
                 spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
                 Thread.Sleep(100);
-                if (textBoxCoding.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
+                if (textBoxZoneValueBSI.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
                 {
                     textBoxInfo.Text = "No coding in this zone";
                 }
@@ -377,15 +388,15 @@ namespace PSA_CVM2
         }
         public void ButtonWriteCodingBSI_Click(object sender, EventArgs e)
         {
-            if (textBoxNewCoding.Text != "")
+            if (textBoxZoneNewValueBSI.Text != "")
                 {
                 textBoxInfo.Text = "New coding not written";
                 }    
-            else if (textBoxCoding.Text == textBoxNewCoding.Text)
+            else if (textBoxZoneValueBSI.Text == textBoxZoneNewValueBSI.Text)
                 {
                     textBoxInfo.Text = "Coding wasn't changed";
                 }
-            else if (textBoxCoding.Text != textBoxNewCoding.Text)
+            else if (textBoxZoneValueBSI.Text != textBoxZoneNewValueBSI.Text)
                 {
                 spArduino.WriteLine(String.Format("1003"));
                 Thread.Sleep(100);
@@ -413,7 +424,7 @@ namespace PSA_CVM2
                 // jesli odpowiedz 6704 to ok
                 // wyslac 2E"zone"xx
                 // spArduino.WriteLine(String.Format("2E" + textBoxZone.Text + textBoxNewCoding.Text));
-                richTextBoxLog.Text += DateTime.Now.ToString() + " > 2E" + textBoxZone.Text + textBoxNewCoding.Text + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + " > 2E" + textBoxZoneBSI.Text + textBoxZoneNewValueBSI.Text + Environment.NewLine;
                 // Thread.Sleep(100);
                 //wyslac ramke 2E2901FD000000010101 aby nie bylo bledu B1003 zabezpieczonego kodowania
                 // spArduino.WriteLine(2E2901FD000000010101);
@@ -478,6 +489,34 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
             Thread.Sleep(100);
         }
+        private void ButtonReadZoneCVM_Click(object sender, EventArgs e)
+        {
+            if (textBoxZoneCVM.Text != "")
+            {
+                spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1003");
+                Thread.Sleep(100);
+                string odebrane3 = ReadZoneUDS(textBoxZoneCVM.Text);
+                string toRemove = "62" + textBoxZoneCVM.Text;
+                string result2 = string.Empty;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
+                int s = odebrane3.IndexOf(toRemove);                                          // Zapis string.Empty lub string = ""; to to samo
+                if (s >= 0)
+                {
+                    result2 = odebrane3.Remove(s, toRemove.Length);
+                }
+                textBoxZoneValueCVM.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
+                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
+                Thread.Sleep(100);
+                if (textBoxZoneValueCVM.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
+                {
+                    textBoxInfo.Text = "No coding in this zone";
+                }
+            }
+            else
+            {
+                textBoxInfo.Text = "Please select zone";
+            }
+        }
         public void ButtonIdentifyDAE_Click(object sender, EventArgs e)
         {
             ConnectModuleKWP(DAE);
@@ -485,6 +524,7 @@ namespace PSA_CVM2
             string odebraneDAEZI = ReadZoneKWP("FE");
             string Ref = odebraneDAEZI.Substring(46, 6);
             textBoxSWDAE.Text = "96" + Ref + "80";
+            textBoxTypDAE.Text = "DAE_BVH2";
             UnlockCodingDAE();
             string CodingKeyDAE = "2305";
         }
@@ -589,43 +629,17 @@ namespace PSA_CVM2
                 UnlockCodingAAS();
             }
         }
-        private void ButtonReadCodingAAS_Click_1(object sender, EventArgs e)
+        private void ButtonReadCodingAAS_Click(object sender, EventArgs e)
         {
-            if (textBoxZoneAAS.Text != "")
-            {
-                spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
-                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1003");
-                Thread.Sleep(100);
-                string odebrane3 = ReadZoneUDS(textBoxZoneAAS.Text);
-                string toRemove = "62" + textBoxZoneAAS.Text;
-                string result2 = string.Empty;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
-                int s = odebrane3.IndexOf(toRemove);                                          // Zapis string.Empty lub string = ""; to to samo
-                if (s >= 0)
-                {
-                    result2 = odebrane3.Remove(s, toRemove.Length);
-                }
-                textBoxCodingAAS.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
-                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
-                Thread.Sleep(100);
-                if (textBoxCodingAAS.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
-                {
-                    textBoxInfo.Text = "No coding in this zone";
-                }
-            }
-            else
-            {
-                textBoxInfo.Text = "Please select zone";
-            }
-            /*
-            if (textBoxTypAAS.Text == "AAS_UDS_G5")
+            /*if (textBoxTypAAS.Text == "AAS_UDS_G5")
             {
                 string odebraneCodingAAS = ReadZoneUDS("2100");
                 string toRemove3 = String.Format("622100");
                 int s2 = odebraneCodingAAS.IndexOf(toRemove3);
                 string resultCodingAAS = odebraneCodingAAS.Remove(s2, toRemove3.Length);
                 textBoxCodingAAS.Text = resultCodingAAS;
-            }
-            else if (textBoxTypAAS.Text == "CPK_UDS_G5")
+            }*/
+            if (textBoxTypAAS.Text == "CPK_UDS_G5")
             {
                 string odebraneCodingAAS = ReadZoneUDS("2101");
                 string toRemove3 = String.Format("622101");
@@ -641,9 +655,34 @@ namespace PSA_CVM2
                 string resultCodingAAS = odebraneCodingAAS.Remove(s2, toRemove3.Length);
                 textBoxCodingAAS.Text = resultCodingAAS;
             }
-            spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
-            Thread.Sleep(100);
-            */
+        }
+        private void ButtonReadZoneAAS_Click(object sender, EventArgs e)
+        {
+            if (textBoxZoneAAS.Text != "")
+            {
+                spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1003");
+                Thread.Sleep(100);
+                string odebrane3 = ReadZoneUDS(textBoxZoneAAS.Text);
+                string toRemove = "62" + textBoxZoneAAS.Text;
+                string result2 = string.Empty;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
+                int s = odebrane3.IndexOf(toRemove);                                          // Zapis string.Empty lub string = ""; to to samo
+                if (s >= 0)
+                {
+                    result2 = odebrane3.Remove(s, toRemove.Length);
+                }
+                textBoxZoneValueAAS.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
+                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
+                Thread.Sleep(100);
+                if (textBoxZoneValueAAS.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
+                {
+                    textBoxInfo.Text = "No coding in this zone";
+                }
+            }
+            else
+            {
+                textBoxInfo.Text = "Please select zone";
+            }
         }
         private void ButtonIdentifyARTIV_Click(object sender, EventArgs e)
         {
@@ -684,15 +723,26 @@ namespace PSA_CVM2
         }
         private void ButtonReadCodingARTIV_Click(object sender, EventArgs e)
         {
-//            if (textBoxTypARTIV.Text == "ARTIV_UDS")
-//            {
-//                string odebraneCodingARTIV = ReadZoneUDS("2101");
-//                string toRemove3 = String.Format("622101");
-//                int s2 = odebraneCodingARTIV.IndexOf(toRemove3);
-//                string resultCodingARTIV = odebraneCodingARTIV.Remove(s2, toRemove3.Length);
-//                textBoxCodingARTIV.Text = resultCodingARTIV;
-//            }
-            if (textBoxZoneARTIV.Text != "RADAR_AV_4")
+            if (textBoxTypARTIV.Text == "ARTIV_UDS")
+            {
+                string odebraneCodingARTIV = ReadZoneUDS("2101");
+                string toRemove3 = String.Format("622101");
+                int s2 = odebraneCodingARTIV.IndexOf(toRemove3);
+                string resultCodingARTIV = odebraneCodingARTIV.Remove(s2, toRemove3.Length);
+                textBoxCodingARTIV.Text = resultCodingARTIV;
+            }
+ /*           else if (textBoxTypARTIV.Text == "RADAR_AV_4")
+            {
+                string odebraneCodingARTIV = ReadZoneUDS("2101");
+                string toRemove3 = String.Format("622101");
+                int s2 = odebraneCodingARTIV.IndexOf(toRemove3);
+                string resultCodingARTIV = odebraneCodingARTIV.Remove(s2, toRemove3.Length);
+                textBoxCodingARTIV.Text = resultCodingARTIV;
+            }*/
+            }
+        private void ButtonReadZoneARTIV_Click(object sender, EventArgs e)
+        {
+            if (textBoxZoneARTIV.Text != "")
             {
                 spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
                 richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1003");
@@ -705,10 +755,10 @@ namespace PSA_CVM2
                 {
                     result2 = odebrane3.Remove(s, toRemove.Length);
                 }
-                textBoxCodingARTIV.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
+                textBoxZoneValueARTIV.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
                 spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
                 Thread.Sleep(100);
-                if (textBoxCodingARTIV.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
+                if (textBoxZoneValueARTIV.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
                 {
                     textBoxInfo.Text = "No coding in this zone";
                 }
@@ -717,10 +767,6 @@ namespace PSA_CVM2
             {
                 textBoxInfo.Text = "Please select zone";
             }
-/*
-                else if (textBoxTypARTIV.Text == "RADAR_AV_4")
-                {
-*/
         }
         private void ButtonIdentifyCOMBINE_Click(object sender, EventArgs e)
         {
@@ -739,6 +785,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
+                CodingKeyCOMBINE = "FAFA";
             }
             else if (typcombine == "26FC")
             {
@@ -753,6 +800,34 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
+            }
+        }
+        private void ButtonReadZoneCOMBINE_Click(object sender, EventArgs e)
+        {
+            if (textBoxZoneCOMBINE.Text != "")
+            {
+                spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1003");
+                Thread.Sleep(100);
+                string odebrane3 = ReadZoneUDS(textBoxZoneCOMBINE.Text);
+                string toRemove = "62" + textBoxZoneCOMBINE.Text;
+                string result2 = string.Empty;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
+                int s = odebrane3.IndexOf(toRemove);                                          // Zapis string.Empty lub string = ""; to to samo
+                if (s >= 0)
+                {
+                    result2 = odebrane3.Remove(s, toRemove.Length);
+                }
+                textBoxZoneValueCOMBINE.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
+                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
+                Thread.Sleep(100);
+                if (textBoxZoneValueCOMBINE.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
+                {
+                    textBoxInfo.Text = "No coding in this zone";
+                }
+            }
+            else
+            {
+                textBoxInfo.Text = "Please select zone";
             }
         }
         private void ButtonIdentifyTELEMAT_Click(object sender, EventArgs e)
@@ -772,6 +847,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                CodingKeyTELEMAT = "D91C";
             }
             else if (typtelemat == "03F5")
             {
@@ -779,6 +855,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + "TELEMEAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                CodingKeyTELEMAT = "F107";
             }
             else
             {
@@ -786,6 +863,34 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+            }
+        }
+        private void ButtonReadZoneTELEMAT_Click(object sender, EventArgs e)
+        {
+            if (textBoxZoneTELEMAT.Text != "")
+            {
+                spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1003");
+                Thread.Sleep(100);
+                string odebrane3 = ReadZoneUDS(textBoxZoneTELEMAT.Text);
+                string toRemove = "62" + textBoxZoneTELEMAT.Text;
+                string result2 = string.Empty;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
+                int s = odebrane3.IndexOf(toRemove);                                          // Zapis string.Empty lub string = ""; to to samo
+                if (s >= 0)
+                {
+                    result2 = odebrane3.Remove(s, toRemove.Length);
+                }
+                textBoxZoneValueTELEMAT.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
+                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
+                Thread.Sleep(100);
+                if (textBoxZoneValueTELEMAT.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
+                {
+                    textBoxInfo.Text = "No coding in this zone";
+                }
+            }
+            else
+            {
+                textBoxInfo.Text = "Please select zone";
             }
         }
         ushort Crc16_x25(byte[] data, int len)
