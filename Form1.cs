@@ -916,29 +916,107 @@ namespace PSA_CVM2
                 bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
             return bytes;
         }
-        public static Int32 Transform(int data, int[] sec)
-        {
-            Int32 result = ((data % sec[0]) * sec[2]) - ((data / sec[0]) * sec[1]);
-            if (result < 0)
-                result += (sec[0] * sec[2]) + sec[1];
-            return result;
-        }
         public static string GetKey(string seedTXT, string appKeyTXT)
         {
-            Int32 result;
+            string result = "";
 
             string[] seed = { seedTXT.Substring(0, 2), seedTXT.Substring(2, 2), seedTXT.Substring(4, 2), seedTXT.Substring(6, 2) };
             string[] appKey = { appKeyTXT.Substring(0, 2), appKeyTXT.Substring(2, 2) };
 
-            // Hardcoded secrets
-            int[] sec_1 = { 0xB2, 0x3F, 0xAA };
-            int[] sec_2 = { 0xB1, 0x02, 0xAB };
+            long x = 0;
+            long a = 0;
+            long b = 0;
+            long c = 0;
+            long d = 0;
+            long appKeyComputed = 0;
+            long val = 0;
+            long key = 0;
+            long key_ = 0;
 
-            // Compute each 16b part of the response, with the twist, and return it
-            Int32 res_msb = Transform(Int16.Parse(appKey[0] + appKey[1], System.Globalization.NumberStyles.HexNumber), sec_1) | Transform(Int16.Parse(seed[0] + seed[3], System.Globalization.NumberStyles.HexNumber), sec_2);
-            Int32 res_lsb = Transform(Int16.Parse(seed[1] + seed[2], System.Globalization.NumberStyles.HexNumber), sec_1) | Transform(res_msb, sec_2);
-            result = (res_msb << 16) | res_lsb;
-            return result.ToString("X8");
+            x = int.Parse(appKey[0] + appKey[1], System.Globalization.NumberStyles.HexNumber);
+            a = int.Parse(appKey[1] + "00" + appKey[0] + appKey[1], System.Globalization.NumberStyles.HexNumber) * 0xAA;
+            if (x > 0x7FFF)
+            {
+                b = ((0x0B81702E1 * (0xFFFFFFFF0000 | x)) >> 32);
+                b = ((0xFFFF0000 | (b & 0xffff)) >> 7) + 0xFE000000;
+            }
+            else
+            {
+                b = ((0x0B81702E1 * x) >> 32) >> 7;
+            }
+            c = ((b + (b >> 0x1F)) & 0xffff) * 0x7673;
+            d = a - c;
+            if ((d & 0xffff) > 0x7FFF)
+            { // Negative
+                d += 0x7673;
+            }
+            appKeyComputed = (d & 0xffff);
+
+            x = int.Parse(seed[0] + seed[3], System.Globalization.NumberStyles.HexNumber);
+            a = x * 0xAB;
+            if (x > 0x7FFF)
+            {
+                b = ((0x0B92143FB * (0xFFFFFFFF0000 | x)) >> 32);
+                b = ((0xFFFF0000 | (b & 0xffff)) >> 7) + 0xFE000000;
+            }
+            else
+            {
+                b = ((0x0B92143FB * x) >> 32) >> 7;
+            }
+            c = ((b + (b >> 0x1F)) & 0xffff) * 0x763D;
+            d = a - c;
+            if ((d & 0xffff) > 0x7FFF)
+            { // Negative
+                d += 0x763D;
+            }
+            d = (d & 0xffff);
+            key = d | appKeyComputed;
+
+            x = int.Parse(seed[1] + seed[2], System.Globalization.NumberStyles.HexNumber);
+            a = x * 0xAA;
+            if (x > 0x7FFF)
+            {
+                b = ((0x0B81702E1 * (0xFFFFFFFF0000 | x)) >> 32);
+                b = ((0xFFFF0000 | (b & 0xffff)) >> 7) + 0xFE000000;
+            }
+            else
+            {
+                b = ((0x0B81702E1 * x) >> 32) >> 7;
+            }
+            c = ((b + (b >> 0x1F)) & 0xffff) * 0x7673;
+            d = a - c;
+            if ((d & 0xffff) > 0x7FFF)
+            { // Negative
+                d += 0x7673;
+            }
+            d = (d & 0xffff);
+
+            val = d;
+
+            x = (key & 0xffff);
+            a = x * 0xAB;
+            if (x > 0x7FFF)
+            {
+                b = ((0x0B92143FB * (0xFFFFFFFF0000 | x)) >> 32);
+                b = ((0xFFFF0000 | (b & 0xffff)) >> 7) + 0xFE000000;
+            }
+            else
+            {
+                b = ((0x0B92143FB * x) >> 32) >> 7;
+            }
+            c = ((b + (b >> 0x1F)) & 0xffff) * 0x763D;
+            d = a - c;
+            if ((d & 0xffff) > 0x7FFF)
+            { // Negative
+                d += 0x763D;
+            }
+            d = (d & 0xffff);
+
+            key_ = (val | d);
+
+            result = key.ToString("X4") + key_.ToString("X4");
+
+            return result;
         }
         public void ButtonAlgo_Click(object sender, EventArgs e)
         {
