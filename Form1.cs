@@ -38,6 +38,8 @@ namespace PSA_CVM2
         public string CodingKeyCOMBINE;
         public string TELEMAT = ">764:664";
         public string CodingKeyTELEMAT;
+        public string INJ = ">6A8:688";
+        public string CodingKeyINJ;
 
         public Form1()
         {
@@ -105,6 +107,9 @@ namespace PSA_CVM2
             LockCodingDAE();
             LockCodingAAS();
             LockCodingARTIV();
+            LockCodingCOMBINE();
+            LockCodingTELEMAT();
+            LockCodingINJ();
             textBoxVin.Clear();
             textBoxInfo.Text = "Disconnected";
             richTextBoxLog.Text += DateTime.Now.ToString() + " Disconnected" + Environment.NewLine;
@@ -267,6 +272,30 @@ namespace PSA_CVM2
             buttonReadZoneARTIV.Enabled = false;
             buttonReadCodingARTIV.Enabled = false;
             buttonWriteCodingARTIV.Enabled = false;
+        }
+        private void UnlockCodingCOMBINE()
+        {
+            buttonReadZoneCOMBINE.Enabled = true;
+        }
+        private void LockCodingCOMBINE()
+        {
+            buttonReadZoneCOMBINE.Enabled = false;
+        }
+        private void UnlockCodingTELEMAT()
+        {
+            buttonReadZoneTELEMAT.Enabled = true;
+        }
+        private void LockCodingTELEMAT()
+        {
+            buttonReadZoneTELEMAT.Enabled = false;
+        }
+        private void UnlockCodingINJ()
+        {
+            buttonReadZoneINJ.Enabled = true;
+        }
+        private void LockCodingINJ()
+        {
+            buttonReadZoneINJ.Enabled = false;
         }
         private void ConnectModuleUDS(string type)
         {
@@ -564,18 +593,17 @@ namespace PSA_CVM2
             //richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane1 + Environment.NewLine;
             // wyslac kodowanie 34A0 z kodowaniem
 
-            /*
-            string str = "34A00000000605" + textBoxNewCoding.Text + "00000000";
+            
+            string str = "34A00000000605" + textBoxNewCodingDAE.Text + "00000000";
             byte[] BTS = StringToByteArray(str);
-            ushort calc_crc = crc16_x25(BTS, BTS.Length);
+            ushort calc_crc = Crc16_x25(BTS, BTS.Length);
 
             calc_crc = (ushort)ROL(calc_crc, 8);
 
             richTextBoxLog.Text += $"CRC16-x25 : {calc_crc.ToString("X")}" + Environment.NewLine;
             string CodingMessage = str + calc_crc.ToString("X");
             richTextBoxLog.Text += CodingMessage + Environment.NewLine;
-            3BA0FFFD0000000101010000
-*/
+//            3BA0FFFD0000000101010000
         }
         public void ButtonIdentifyAAS_Click(object sender, EventArgs e)
         {
@@ -786,6 +814,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
                 CodingKeyCOMBINE = "FAFA";
+                UnlockCodingCOMBINE();
             }
             else if (typcombine == "26FC")
             {
@@ -793,6 +822,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
+                UnlockCodingCOMBINE();
             }
             else
             {
@@ -800,6 +830,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
+                UnlockCodingCOMBINE();
             }
         }
         private void ButtonReadZoneCOMBINE_Click(object sender, EventArgs e)
@@ -848,6 +879,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
                 CodingKeyTELEMAT = "D91C";
+                UnlockCodingTELEMAT();
             }
             else if (typtelemat == "03F5")
             {
@@ -856,6 +888,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
                 CodingKeyTELEMAT = "F107";
+                UnlockCodingTELEMAT();
             }
             else
             {
@@ -863,6 +896,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString() + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
                 richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                UnlockCodingTELEMAT();
             }
         }
         private void ButtonReadZoneTELEMAT_Click(object sender, EventArgs e)
@@ -884,6 +918,89 @@ namespace PSA_CVM2
                 spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
                 Thread.Sleep(100);
                 if (textBoxZoneValueTELEMAT.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
+                {
+                    textBoxInfo.Text = "No coding in this zone";
+                }
+            }
+            else
+            {
+                textBoxInfo.Text = "Please select zone";
+            }
+        }
+        private void ButtonIdentifyINJ_Click(object sender, EventArgs e)
+        {
+            ConnectModuleUDS(INJ);
+            string odebraneINJZA = ReadZoneUDS("F080");
+            string odebraneINJZI = ReadZoneUDS("F0FE");
+            string[] Ref = { odebraneINJZI.Substring(48, 6) };
+            textBoxSWINJ.Text = "96" + Ref[0] + "80";
+            textBoxHWINJ.Text = odebraneINJZA.Substring(20, 10);
+            string typINJ = odebraneINJZI.Substring(14, 4);                                          // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
+            textBoxTypINJ.Text = typINJ;
+            if (typINJ == "0326")
+            {
+                textBoxTypINJ.Text = "CMM_MG1CS042";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                //                string CodingKeyINJ = "0000";
+                UnlockCodingINJ();
+            }
+            else if (typINJ == "0D13")
+            {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
+                textBoxTypINJ.Text = "CMM_VD56";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                //                string CodingKeyINJ = "0000";
+                UnlockCodingINJ();
+            }
+            else if (typINJ == "0337")
+            {
+                textBoxTypINJ.Text = "CMM_MD1CS003_EURO6_3";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                //                string CodingKeyINJ = "0000";
+                UnlockCodingINJ();
+            }
+            else if (typINJ == "0324")
+            {
+                textBoxTypINJ.Text = "CMM_MG1CS042_PHEV";
+                richTextBoxLog.Text += DateTime.Now.ToString() + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                //                string CodingKeyINJ = "0000";
+                UnlockCodingINJ();
+            }
+            else
+            {
+                textBoxTypINJ.Text = "Unknown " + typINJ;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                UnlockCodingINJ();
+            }
+        }
+        private void buttonReadZoneINJ_Click(object sender, EventArgs e)
+        {
+            if (textBoxZoneINJ.Text != "")
+            {
+                spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + String.Format(" > 1003");
+                Thread.Sleep(100);
+                string odebrane3 = ReadZoneUDS(textBoxZoneINJ.Text);
+                string toRemove = "62" + textBoxZoneINJ.Text;
+                string result2 = string.Empty;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
+                int s = odebrane3.IndexOf(toRemove);                                          // Zapis string.Empty lub string = ""; to to samo
+                if (s >= 0)
+                {
+                    result2 = odebrane3.Remove(s, toRemove.Length);
+                }
+                textBoxZoneValueINJ.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
+                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
+                Thread.Sleep(100);
+                if (textBoxZoneValueINJ.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
                 {
                     textBoxInfo.Text = "No coding in this zone";
                 }
