@@ -205,6 +205,7 @@ namespace PSA_CVM2
             buttonIdentifyARTIV.Enabled = false;
             buttonIdentifyCOMBINE.Enabled = false;
             buttonIdentifyTELEMAT.Enabled = false;
+            buttonIdentifyINJ.Enabled = false;
         }
         private void UnlockIdentification()
         {
@@ -216,16 +217,17 @@ namespace PSA_CVM2
             buttonIdentifyARTIV.Enabled = true;
             buttonIdentifyCOMBINE.Enabled = true;
             buttonIdentifyTELEMAT.Enabled = true;
+            buttonIdentifyINJ.Enabled = true;
         }
         private void UnlockCodingBSI()
         {
             buttonReadZoneBSI.Enabled = true;
-            buttonWriteCodingBSI.Enabled = true;
+            buttonWriteZoneBSI.Enabled = true;
         }
         private void LockCodingBSI()
         {
             buttonReadZoneBSI.Enabled = false;
-            buttonWriteCodingBSI.Enabled = false;
+            buttonWriteZoneBSI.Enabled = false;
         }
         private void UnlockCodingCVM()
         {
@@ -348,42 +350,51 @@ namespace PSA_CVM2
             ConnectModuleUDS(BSI);
             string odebraneBSIZA = ReadZoneUDS("F080");
             string odebraneBSIZI = ReadZoneUDS("F0FE");
-            string Ref = odebraneBSIZI.Substring(48, 6);
-            textBoxSWBSI.Text = "96" + Ref + "80";
+            //string Ref = odebraneBSIZI.Substring(48, 6);
+            string[] RefBSIZI = { odebraneBSIZI.Substring(28, 2), odebraneBSIZI.Substring(30, 2), odebraneBSIZI.Substring(32, 6), odebraneBSIZI.Substring(46, 2), odebraneBSIZI.Substring(48, 6) };
+            textBoxSWBSI.Text = "96" + RefBSIZI[4] + "80";
             textBoxHWBSI.Text = odebraneBSIZA.Substring(20, 10);
             string typbsi = odebraneBSIZI.Substring(14, 4);// wydobycie z ciągu sekcji 4 bajtów typu modułu z odebranych danych
             textBoxTypBSI.Text = typbsi;
             if (typbsi == "13B3")
                 {                                          // warunek przypisania typu modułu do kodu Bajtowego
-                    textBoxTypBSI.Text = "DELPHI";
-                    richTextBoxLog.Text += DateTime.Now.ToString() + "BSI " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
+                    textBoxTypBSI.Text = "DELPHI BSI2010_EV";
+                    richTextBoxLog.Text += Environment.NewLine + "BSI: " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "SW: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefBSIZI[0]) +"." + string.Format(RefBSIZI[1]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBSIZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
                     CodingKeyBSI = "B4E0";
                     UnlockCodingBSI();
                 }
             else if (typbsi == "06B3")
                 {
                     textBoxTypBSI.Text = "VALEO NOx";
-                    richTextBoxLog.Text += DateTime.Now.ToString() + "BSI " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += Environment.NewLine + "BSI: " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "SW: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefBSIZI[0]) + "." + string.Format(RefBSIZI[1]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBSIZI[2]) + Environment.NewLine;
+                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
                     UnlockCodingBSI();
                 }
             else if (typbsi == "0DB3")
                 {
-                    textBoxTypBSI.Text = "CONTINENTAL";
-                    richTextBoxLog.Text += DateTime.Now.ToString() + "BSI " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
+                    textBoxTypBSI.Text = "CONTINENTAL Q0x";
+                    richTextBoxLog.Text += Environment.NewLine + "BSI: " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "SW: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefBSIZI[0]) + "." + string.Format(RefBSIZI[1]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBSIZI[2]) + Environment.NewLine;
+                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
                     UnlockCodingBSI();
                 }
             else
                 {
                     textBoxTypBSI.Text = "Unknown " + typbsi;
-                    richTextBoxLog.Text += DateTime.Now.ToString() + "BSI " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += Environment.NewLine + "BSI: " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "SW: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefBSIZI[0]) + "." + string.Format(RefBSIZI[1]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBSIZI[2]) + Environment.NewLine;
+                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
                     UnlockCodingBSI();
                 }
         }
@@ -403,8 +414,8 @@ namespace PSA_CVM2
                     result2 = odebrane3.Remove(s, toRemove.Length);
                 }
                 textBoxZoneValueBSI.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
-                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
-                Thread.Sleep(100);
+                //spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
+                //Thread.Sleep(100);
                 if (textBoxZoneValueBSI.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
                 {
                     textBoxInfo.Text = "No coding in this zone";
@@ -415,50 +426,64 @@ namespace PSA_CVM2
                 textBoxInfo.Text = "Please select zone";
                 }
         }
-        public void ButtonWriteCodingBSI_Click(object sender, EventArgs e)
+        public void ButtonWriteZoneBSI_Click(object sender, EventArgs e)
         {
-            if (textBoxZoneNewValueBSI.Text != "")
+            if (textBoxZoneNewValueBSI.Text == "")
                 {
                 textBoxInfo.Text = "New coding not written";
                 }    
             else if (textBoxZoneValueBSI.Text == textBoxZoneNewValueBSI.Text)
                 {
-                    textBoxInfo.Text = "Coding wasn't changed";
+                textBoxInfo.Text = "Coding wasn't changed";
                 }
             else if (textBoxZoneValueBSI.Text != textBoxZoneNewValueBSI.Text)
-                {
+            {
                 spArduino.WriteLine(String.Format("1003"));
                 Thread.Sleep(100);
                 string odebrane = serialData;
                 richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebrane + Environment.NewLine;
-                // wyslac 2703
-                spArduino.WriteLine(String.Format("2703"));  //  wysyłamy polecenie CAN do odczytu strefy
-                richTextBoxLog.Text += DateTime.Now.ToString() + " > 2703" + Environment.NewLine;
+                spArduino.WriteLine(String.Format("2703"));  //  wysyłamy polecenie CAN by otwrzymać SEED do odblokowania kodowania
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " > 2703" + Environment.NewLine;
                 Thread.Sleep(500);
                 string odebrane1 = serialData;
-                richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane1 + Environment.NewLine;
-                // odebrac 6703xxxxxxx
-                string Seed = odebrane1.Substring(4, 8);
-                richTextBoxLog.Text += DateTime.Now.ToString() + " Seed:" + Seed + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + " Key:" + CodingKeyBSI + Environment.NewLine;
-                // wygenerowc seedkey
-                string SeedKey = GetKey(Seed, CodingKeyBSI);
-                richTextBoxLog.Text += DateTime.Now.ToString() + " Seedkey: " + SeedKey + Environment.NewLine;
-                // wyslac 2704xxxxxxxx
-                spArduino.WriteLine(String.Format("2704" + SeedKey));
-                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " > 2704" + SeedKey + Environment.NewLine;
-                Thread.Sleep(100);
-                string odebrane2 = serialData;
-                richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane2 + Environment.NewLine;
-                // jesli odpowiedz 6704 to ok
-                // wyslac 2E"zone"xx
-                // spArduino.WriteLine(String.Format("2E" + textBoxZone.Text + textBoxNewCoding.Text));
-                richTextBoxLog.Text += DateTime.Now.ToString() + " > 2E" + textBoxZoneBSI.Text + textBoxZoneNewValueBSI.Text + Environment.NewLine;
-                // Thread.Sleep(100);
-                //wyslac ramke 2E2901FD000000010101 aby nie bylo bledu B1003 zabezpieczonego kodowania
-                // spArduino.WriteLine(2E2901FD000000010101);
-                richTextBoxLog.Text += DateTime.Now.ToString() + " > 2E290100000000010101" + Environment.NewLine;
-                // Thread.Sleep(100);
+                    richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane1 + Environment.NewLine;
+                if (odebrane1.Substring(0, 4) == "6703")
+                {
+                    string Seed = odebrane1.Substring(4, 8);
+                    richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " Seed: " + Seed + Environment.NewLine;
+                    richTextBoxLog.Text += DateTime.Now.ToString() + " Key: " + CodingKeyBSI + Environment.NewLine;
+                    // wygenerowc seedkey
+                    string SeedKey = GetKey(Seed, CodingKeyBSI);
+                    richTextBoxLog.Text += DateTime.Now.ToString() + " Seedkey: " + SeedKey + Environment.NewLine;
+                    // wyslac 2704xxxxxxxx
+                    spArduino.WriteLine(String.Format("2704" + SeedKey));
+                    richTextBoxLog.Text += DateTime.Now.ToString() + " > 2704" + SeedKey + Environment.NewLine;
+                    Thread.Sleep(100);
+                    string odebrane2 = serialData;
+                    richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane2 + Environment.NewLine;
+                    if (odebrane2.Substring(0, 4) == "6704")// jesli odpowiedz 6704 to ok
+                    {// wyslac 2E"zone"xx
+                        spArduino.WriteLine(String.Format("2E" + textBoxZoneBSI.Text + textBoxZoneNewValueBSI.Text));
+                        richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " > 2E" + textBoxZoneBSI.Text + textBoxZoneNewValueBSI.Text + Environment.NewLine;
+                        Thread.Sleep(100);
+                        string odebrane3 = serialData;
+                        richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane3 + Environment.NewLine;
+                        //wyslac ramke 2E2901FD000000010101 aby nie bylo bledu B1003 zabezpieczonego kodowania
+                        spArduino.WriteLine("2E2901FD000000010101");
+                        richTextBoxLog.Text += DateTime.Now.ToString() + " > 2E290100000000010101" + Environment.NewLine;
+                        Thread.Sleep(100);
+                        string odebrane4 = serialData;
+                        richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane4 + Environment.NewLine;
+                    }
+                    else
+                    {
+                        textBoxInfo.Text = "Seedkey not correct";
+                    }
+                }
+                else
+                {
+                    textBoxInfo.Text = "Coding conditions not met";
+                }
             }
         }
         public void ButtonIdentifyCVM_Click(object sender, EventArgs e)
@@ -466,8 +491,9 @@ namespace PSA_CVM2
             ConnectModuleUDS(CVM);
             string odebraneCVMZA = ReadZoneUDS("F080");
             string odebraneCVMZI = ReadZoneUDS("F0FE");
-            string Ref = odebraneCVMZI.Substring(48, 6);
-            textBoxSWCVM.Text = "96" + Ref + "80";
+            string[] RefCVMZI = { odebraneCVMZI.Substring(28, 2), odebraneCVMZI.Substring(30, 2), odebraneCVMZI.Substring(32, 6), odebraneCVMZI.Substring(46, 2), odebraneCVMZI.Substring(48, 6) };
+            //string Ref = odebraneCVMZI.Substring(48, 6);
+            textBoxSWCVM.Text = "96" + RefCVMZI[4] + "80";
             textBoxHWCVM.Text = odebraneCVMZA.Substring(20, 10);
             string typcvm = odebraneCVMZA.Substring(47, 3);                                         // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
             textBoxTypCVM.Text = typcvm;
@@ -475,26 +501,32 @@ namespace PSA_CVM2
             if (typcvm == "199")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypCVM.Text = "CVM_2";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "CVM: " + string.Format(textBoxTypCVM.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCVM.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "CVM: " + string.Format(textBoxTypCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefCVMZI[0]) + "." + string.Format(RefCVMZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCVMZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
                 //                string CodingKeyCVM = "E2E5";
                 UnlockCodingCVM();
             }
             else if (typcvm == "179")
             {
                 textBoxTypCVM.Text = "CVM_3";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "CVM: " + string.Format(textBoxTypCVM.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCVM.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "CVM: " + string.Format(textBoxTypCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefCVMZI[0]) + "." + string.Format(RefCVMZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCVMZI[2]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
                 UnlockCodingCVM();
             }
             else
             {
                 textBoxTypCVM.Text = "Unknown " + typcvm;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "CVM: " + string.Format(textBoxTypCVM.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCVM.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "CVM: " + string.Format(textBoxTypCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefCVMZI[0]) + "." + string.Format(RefCVMZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCVMZI[2]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
             }
         }
         private void ButtonReadCodingCVM_Click(object sender, EventArgs e)
@@ -517,6 +549,66 @@ namespace PSA_CVM2
             }
             spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
             Thread.Sleep(100);
+        }
+        private void ButtonWriteCodingCVM_Click(object sender, EventArgs e)
+        {
+            if (textBoxCVMNewCoding.Text == "")
+            {
+                textBoxInfo.Text = "New coding not written";
+            }
+            else if (textBoxCVMCoding.Text == textBoxCVMNewCoding.Text)
+            {
+                textBoxInfo.Text = "Coding wasn't changed";
+            }
+            else if (textBoxCVMCoding.Text != textBoxCVMNewCoding.Text)
+            {
+                spArduino.WriteLine(String.Format("1003"));
+                Thread.Sleep(100);
+                string odebrane = serialData;
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " < " + odebrane + Environment.NewLine;
+                spArduino.WriteLine(String.Format("2703"));  //  wysyłamy polecenie CAN by otwrzymać SEED do odblokowania kodowania
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " > 2703" + Environment.NewLine;
+                Thread.Sleep(500);
+                string odebrane1 = serialData;
+                richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane1 + Environment.NewLine;
+                if (odebrane1.Substring(0, 4) == "6703")
+                {
+                    string Seed = odebrane1.Substring(4, 8);
+                    richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " Seed: " + Seed + Environment.NewLine;
+                    richTextBoxLog.Text += DateTime.Now.ToString() + " Key: " + CodingKeyCVM + Environment.NewLine;
+                    // wygenerowc seedkey
+                    string SeedKey = GetKey(Seed, CodingKeyBSI);
+                    richTextBoxLog.Text += DateTime.Now.ToString() + " Seedkey: " + SeedKey + Environment.NewLine;
+                    // wyslac 2704xxxxxxxx
+                    spArduino.WriteLine(String.Format("2704" + SeedKey));
+                    richTextBoxLog.Text += DateTime.Now.ToString() + " > 2704" + SeedKey + Environment.NewLine;
+                    Thread.Sleep(100);
+                    string odebrane2 = serialData;
+                    richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane2 + Environment.NewLine;
+                    if (odebrane2.Substring(0, 4) == "6704")// jesli odpowiedz 6704 to ok
+                    {// wyslac 2E"zone"xx
+                        spArduino.WriteLine(String.Format("2E" + /*textBoxCVMZone.Text*/ + textBoxCVMNewCoding.Text));
+                        richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString() + " > 2E" + /*textBoxZoneBSI.Text*/ + textBoxCVMNewCoding.Text + Environment.NewLine;
+                        Thread.Sleep(100);
+                        string odebrane3 = serialData;
+                        richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane3 + Environment.NewLine;
+                        //wyslac ramke 2E2901FD000000010101 aby nie bylo bledu B1003 zabezpieczonego kodowania
+                        spArduino.WriteLine("2E2901FD000000010101");
+                        richTextBoxLog.Text += DateTime.Now.ToString() + " > 2E290100000000010101" + Environment.NewLine;
+                        Thread.Sleep(100);
+                        string odebrane4 = serialData;
+                        richTextBoxLog.Text += DateTime.Now.ToString() + " < " + odebrane4 + Environment.NewLine;
+                    }
+                    else
+                    {
+                        textBoxInfo.Text = "Seedkey not correct";
+                    }
+                }
+                else
+                {
+                    textBoxInfo.Text = "Coding conditions not met";
+                }
+            }
         }
         private void ButtonReadZoneCVM_Click(object sender, EventArgs e)
         {
@@ -610,8 +702,9 @@ namespace PSA_CVM2
             ConnectModuleUDS(AAS);
             string odebraneAASZA = ReadZoneUDS("F080");
             string odebraneAASZI = ReadZoneUDS("F0FE");
-            string[] Ref = { odebraneAASZI.Substring(48, 6) };
-            textBoxSWAAS.Text = "96" + Ref[0] + "80";
+            string[] RefAASZI = { odebraneAASZI.Substring(28, 2), odebraneAASZI.Substring(30, 2), odebraneAASZI.Substring(32, 6), odebraneAASZI.Substring(46, 2), odebraneAASZI.Substring(48, 6) };
+            //string[] Ref = { odebraneAASZI.Substring(48, 6) };
+            textBoxSWAAS.Text = "96" + RefAASZI[4] + "80";
             textBoxHWAAS.Text = odebraneAASZA.Substring(20, 10);
             string typAAS = odebraneAASZA.Substring(46, 4);                                          // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
             textBoxTypAAS.Text = typAAS;
@@ -624,36 +717,55 @@ namespace PSA_CVM2
             if (typAAS == "2199")
             {
                 textBoxTypAAS.Text = "AAS_UDS_G5";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefAASZI[0]) + "." + string.Format(RefAASZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
                 //                string CodingKeyAAS = "0000";
                 UnlockCodingAAS();
             }
             else if (typAAS == "8199")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypAAS.Text = "CPK_UDS_G5";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefAASZI[0]) + "." + string.Format(RefAASZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
                 string CodingKeyAAS = "D1F5";
+                UnlockCodingAAS();
+            }
+            else if (typAAS == "4599")
+            {
+                textBoxTypAAS.Text = "AAS_G4";
+                richTextBoxLog.Text += Environment.NewLine + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefAASZI[0]) + "." + string.Format(RefAASZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                //               string CodingKeyAAS = "xxxx";
                 UnlockCodingAAS();
             }
             else if (typAAS == "FFFF")
             {
                 textBoxTypAAS.Text = "AAS_UDS_G6";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefAASZI[0]) + "." + string.Format(RefAASZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
                 //               string CodingKeyAAS = "B6F0";
                 UnlockCodingAAS();
             }
             else
             {
                 textBoxTypAAS.Text = "Unknown " + typAAS;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefAASZI[0]) + "." + string.Format(RefAASZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
                 UnlockCodingAAS();
             }
         }
@@ -717,8 +829,9 @@ namespace PSA_CVM2
             ConnectModuleUDS(ARTIV);
             string odebraneARTIVZA = ReadZoneUDS("F080");
             string odebraneARTIVZI = ReadZoneUDS("F0FE");
-            string Ref = odebraneARTIVZI.Substring(48, 6);
-            textBoxSWARTIV.Text = "96" + Ref + "80";
+            string[] RefARTIVZI = { odebraneARTIVZI.Substring(28, 2), odebraneARTIVZI.Substring(30, 2), odebraneARTIVZI.Substring(32, 6), odebraneARTIVZI.Substring(46, 2), odebraneARTIVZI.Substring(48, 6) };
+            //string Ref = odebraneARTIVZI.Substring(48, 6);
+            textBoxSWARTIV.Text = "96" + RefARTIVZI[4] + "80";
             textBoxHWARTIV.Text = odebraneARTIVZA.Substring(20, 10);
 
             string typartiv = odebraneARTIVZA.Substring(47, 3);                                           // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
@@ -726,26 +839,32 @@ namespace PSA_CVM2
             if (typartiv == "FFF")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypARTIV.Text = "ARTIV_UDS";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "ARTIV: " + string.Format(textBoxTypARTIV.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWARTIV.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "ARTIV: " + string.Format(textBoxTypARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefARTIVZI[0]) + "." + string.Format(RefARTIVZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefARTIVZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
                 //string CodingKeyARTIV = "xxxx";
                 UnlockCodingARTIV();
             }
             else if (typartiv == "153")
             {
                 textBoxTypARTIV.Text = "RADAR_AV_4";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "ARTIV: " + string.Format(textBoxTypARTIV.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWARTIV.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "ARTIV: " + string.Format(textBoxTypARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefARTIVZI[0]) + "." + string.Format(RefARTIVZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefARTIVZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
                 UnlockCodingARTIV();
             }
             else
             {
                 textBoxTypARTIV.Text = "Unknown " + typartiv;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "ARTIV: " + string.Format(textBoxTypARTIV.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWARTIV.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "ARTIV: " + string.Format(textBoxTypARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWARTIV.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefARTIVZI[0]) + "." + string.Format(RefARTIVZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefARTIVZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
                 UnlockCodingARTIV();
             }  
         }
@@ -801,8 +920,9 @@ namespace PSA_CVM2
             ConnectModuleUDS(COMBINE);
             string odebraneCOMBINEZA = ReadZoneUDS("F080");
             string odebraneCOMBINEZI = ReadZoneUDS("F0FE");
-            string Ref = odebraneCOMBINEZI.Substring(48, 6);
-            textBoxSWCOMBINE.Text = "96" + Ref + "80";
+            string[] RefCOMBINEZI = { odebraneCOMBINEZI.Substring(28, 2), odebraneCOMBINEZI.Substring(30, 2), odebraneCOMBINEZI.Substring(32, 6), odebraneCOMBINEZI.Substring(46, 2), odebraneCOMBINEZI.Substring(48, 6) };
+            //string Ref = odebraneCOMBINEZI.Substring(48, 6);
+            textBoxSWCOMBINE.Text = "96" + RefCOMBINEZI[4] + "80";
             textBoxHWCOMBINE.Text = odebraneCOMBINEZA.Substring(20, 10);
 
             string typcombine = odebraneCOMBINEZI.Substring(14, 4);
@@ -810,26 +930,32 @@ namespace PSA_CVM2
             if (typcombine == "02FC")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypCOMBINE.Text = "CIROCCO";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefCOMBINEZI[0]) + "." + string.Format(RefCOMBINEZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCOMBINEZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
                 CodingKeyCOMBINE = "FAFA";
                 UnlockCodingCOMBINE();
             }
             else if (typcombine == "26FC")
             {
                 textBoxTypCOMBINE.Text = "COMBINE_UDS_EV";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefCOMBINEZI[0]) + "." + string.Format(RefCOMBINEZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCOMBINEZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
                 UnlockCodingCOMBINE();
             }
             else
             {
                 textBoxTypCOMBINE.Text = "Unknown " + typcombine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefCOMBINEZI[0]) + "." + string.Format(RefCOMBINEZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCOMBINEZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
                 UnlockCodingCOMBINE();
             }
         }
@@ -866,8 +992,9 @@ namespace PSA_CVM2
             ConnectModuleUDS(TELEMAT);
             string odebraneTELEMATZA = ReadZoneUDS("F080");
             string odebraneTELEMATZI = ReadZoneUDS("F0FE");
-            string Ref = odebraneTELEMATZI.Substring(48, 6);
-            textBoxSWTELEMAT.Text = "96" + Ref + "80";
+            string[] RefTELEMATZI = { odebraneTELEMATZI.Substring(28, 2), odebraneTELEMATZI.Substring(30, 2), odebraneTELEMATZI.Substring(32, 6), odebraneTELEMATZI.Substring(46, 2), odebraneTELEMATZI.Substring(48, 6) };
+            //string Ref = odebraneTELEMATZI.Substring(48, 6);
+            textBoxSWTELEMAT.Text = "96" + RefTELEMATZI[4] + "80";
             textBoxHWTELEMAT.Text = odebraneTELEMATZA.Substring(20, 10);
 
             string typtelemat = odebraneTELEMATZI.Substring(14, 4);
@@ -875,27 +1002,33 @@ namespace PSA_CVM2
             if (typtelemat == "0DF5")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypTELEMAT.Text = "NAC";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefTELEMATZI[0]) + "." + string.Format(RefTELEMATZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
                 CodingKeyTELEMAT = "D91C";
                 UnlockCodingTELEMAT();
             }
             else if (typtelemat == "03F5")
             {
                 textBoxTypTELEMAT.Text = "RCC";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "TELEMEAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefTELEMATZI[0]) + "." + string.Format(RefTELEMATZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
                 CodingKeyTELEMAT = "F107";
                 UnlockCodingTELEMAT();
             }
             else
             {
                 textBoxTypTELEMAT.Text = "Unknown " + typtelemat;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefTELEMATZI[0]) + "." + string.Format(RefTELEMATZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
                 UnlockCodingTELEMAT();
             }
         }
@@ -932,57 +1065,79 @@ namespace PSA_CVM2
             ConnectModuleUDS(INJ);
             string odebraneINJZA = ReadZoneUDS("F080");
             string odebraneINJZI = ReadZoneUDS("F0FE");
-            string[] Ref = { odebraneINJZI.Substring(48, 6) };
-            textBoxSWINJ.Text = "96" + Ref[0] + "80";
+            string[] RefINJZI = { odebraneINJZI.Substring(28, 2), odebraneINJZI.Substring(30, 2), odebraneINJZI.Substring(32, 6), odebraneINJZI.Substring(46, 2), odebraneINJZI.Substring(48, 6) };
+            //string[] Ref = { odebraneINJZI.Substring(48, 6) };
+            textBoxSWINJ.Text = "96" + RefINJZI[4] + "80";
             textBoxHWINJ.Text = odebraneINJZA.Substring(20, 10);
             string typINJ = odebraneINJZI.Substring(14, 4);                                          // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
             textBoxTypINJ.Text = typINJ;
             if (typINJ == "0326")
             {
                 textBoxTypINJ.Text = "CMM_MG1CS042";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefINJZI[0]) + "." + string.Format(RefINJZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
             else if (typINJ == "0D13")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypINJ.Text = "CMM_VD56";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefINJZI[0]) + "." + string.Format(RefINJZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
             else if (typINJ == "0337")
             {
                 textBoxTypINJ.Text = "CMM_MD1CS003_EURO6_3";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefINJZI[0]) + "." + string.Format(RefINJZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
             else if (typINJ == "0324")
             {
                 textBoxTypINJ.Text = "CMM_MG1CS042_PHEV";
-                richTextBoxLog.Text += DateTime.Now.ToString() + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefINJZI[0]) + "." + string.Format(RefINJZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                //                string CodingKeyINJ = "0000";
+                UnlockCodingINJ();
+            }
+            else if (typINJ == "1330")
+            {
+                textBoxTypINJ.Text = "CMM_DCM71";
+                richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefINJZI[0]) + "." + string.Format(RefINJZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
             else
             {
                 textBoxTypINJ.Text = "Unknown " + typINJ;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += DateTime.Now.ToString() + "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "SW Edition(Hex): " + string.Format(RefINJZI[0]) + "." + string.Format(RefINJZI[1]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
                 UnlockCodingINJ();
             }
         }
-        private void buttonReadZoneINJ_Click(object sender, EventArgs e)
+        private void ButtonReadZoneINJ_Click(object sender, EventArgs e)
         {
             if (textBoxZoneINJ.Text != "")
             {
