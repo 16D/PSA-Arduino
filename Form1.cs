@@ -44,7 +44,6 @@ namespace PSA_CVM2
         public string BVA = ">6A9:689";
         public string CodingKeyBVA;
         private string zone;
-
         public Form1()
         {
             InitializeComponent();
@@ -123,11 +122,10 @@ namespace PSA_CVM2
             textBoxInfo.Text = "Disconnected";
             richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " Disconnected" + Environment.NewLine;
         }
-        public void SpArduino_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        public async void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
+            SerialPort spArduino = (SerialPort)sender;
             serialData = spArduino.ReadLine();
-            //richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + serialData + Environment.NewLine;
-
         }
         private void ButtonClearLog_Click(object sender, EventArgs e)
         {
@@ -141,16 +139,12 @@ namespace PSA_CVM2
             {
                 richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + String.Format(odpowiedz) + Environment.NewLine;
                 Vinbsi();
-                Thread.Sleep(500); 
             }
             else
             {
                 richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " Not connected to car" + Environment.NewLine;
                 textBoxInfo.Text = "Not connected to car";
                 MessageBox.Show("Not connected to car");
-                spArduino.WriteLine(String.Format("1001"));
-                richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" > 1001") + Environment.NewLine;
-                Thread.Sleep(100);
             }
         }
         public void Vinbsi()
@@ -317,13 +311,13 @@ namespace PSA_CVM2
             textBoxInfo.Clear(); 
             spArduino.WriteLine(String.Format("1001"));
             richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" > 1001") + Environment.NewLine;
-            Thread.Sleep(100);
             spArduino.WriteLine(String.Format(type));
             richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " " + String.Format(type) + Environment.NewLine;
-            Thread.Sleep(100);
+            Task.Delay(10).Wait();
             spArduino.WriteLine(String.Format("1003"));
             richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" > 1003") + Environment.NewLine;
-            Thread.Sleep(500);
+            Task.Delay(50).Wait();
+            spArduino.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
             string odpowiedz = serialData;
             return odpowiedz;
         }
@@ -369,23 +363,39 @@ namespace PSA_CVM2
         }
         public void ButtonIdentifyBSI_Click(object sender, EventArgs e)
         {
-            ConnectModuleUDS(BSI);
+            richTextBoxLog.Text += Environment.NewLine + "Connecting to BSI" + Environment.NewLine;
+            string odpowiedz = ConnectModuleUDS(BSI);
+            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + String.Format(odpowiedz) + Environment.NewLine;
             string odebraneBSIZA = ReadZoneUDS("F080");
             string odebraneBSIZI = ReadZoneUDS("F0FE");
-            string[] RefBSIZI = { odebraneBSIZI.Substring(26, 2), odebraneBSIZI.Substring(28, 2), odebraneBSIZI.Substring(30, 2), odebraneBSIZI.Substring(32, 6), odebraneBSIZI.Substring(46, 2), odebraneBSIZI.Substring(48, 6) };
-            textBoxSWBSI.Text = "96" + RefBSIZI[5] + "80";
+            string[] RefBSIZI = { odebraneBSIZI.Substring(18, 6), odebraneBSIZI.Substring(26, 2), odebraneBSIZI.Substring(28, 2), odebraneBSIZI.Substring(30, 2), odebraneBSIZI.Substring(32, 6), odebraneBSIZI.Substring(46, 2), odebraneBSIZI.Substring(48, 6) };
+            textBoxSWBSI.Text = "96" + RefBSIZI[6] + "80";
             textBoxHWBSI.Text = odebraneBSIZA.Substring(20, 10);
+            int TD = Convert.ToInt32(RefBSIZI[4].Substring(0, 2), 16);
+            int TM = Convert.ToInt32(RefBSIZI[4].Substring(2, 2), 16);
+            int TY = Convert.ToInt32(RefBSIZI[4].Substring(4, 2), 16);
+            string TDstring = TD.ToString();
+            string TMstring = TM.ToString();
+            string TYstring = "20" + TY.ToString(); 
+            if (RefBSIZI[4].Substring(0, 2) == "FF")
+            {
+                TDstring = RefBSIZI[4].Substring(0, 2);
+                TMstring = RefBSIZI[4].Substring(2, 2);
+                TYstring = RefBSIZI[4].Substring(4, 2);
+            }
             string typbsi = odebraneBSIZI.Substring(14, 4);// wydobycie z ciągu sekcji 4 bajtów typu modułu z odebranych danych
             textBoxTypBSI.Text = typbsi;
             if (typbsi == "13B3")
                 {                                          // warunek przypisania typu modułu do kodu Bajtowego
                     textBoxTypBSI.Text = "DELPHI BSI2010_EV";
                     richTextBoxLog.Text += Environment.NewLine + "BSI: " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Version: " + RefBSIZI[0] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefBSIZI[1] + Environment.NewLine;
                     richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefBSIZI[1]) +"." + string.Format(RefBSIZI[2]) + Environment.NewLine;
-                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBSIZI[4]) + Environment.NewLine;
-                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefBSIZI[2]) +"." + string.Format(RefBSIZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBSIZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefBSIZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefBSIZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefBSIZI[0].Substring(4, 2), 16);
                     CodingKeyBSI = "B4E0";
                     UnlockCodingBSI();
                 }
@@ -393,33 +403,39 @@ namespace PSA_CVM2
                 {
                     textBoxTypBSI.Text = "VALEO NOx";
                     richTextBoxLog.Text += Environment.NewLine + "BSI: " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Version: " + RefBSIZI[0] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefBSIZI[1] + Environment.NewLine;
                     richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefBSIZI[1]) + "." + string.Format(RefBSIZI[2]) + Environment.NewLine;
-                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBSIZI[4]) + Environment.NewLine;
-                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefBSIZI[2]) + "." + string.Format(RefBSIZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBSIZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefBSIZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefBSIZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefBSIZI[0].Substring(4, 2), 16);
                     UnlockCodingBSI();
                 }
             else if (typbsi == "0DB3")
                 {
                     textBoxTypBSI.Text = "CONTINENTAL Q0x";
                     richTextBoxLog.Text += Environment.NewLine + "BSI: " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Version: " + RefBSIZI[0] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefBSIZI[1] + Environment.NewLine;
                     richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefBSIZI[1]) + "." + string.Format(RefBSIZI[2]) + Environment.NewLine;
-                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBSIZI[4]) + Environment.NewLine;
-                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefBSIZI[2]) + "." + string.Format(RefBSIZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBSIZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefBSIZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefBSIZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefBSIZI[0].Substring(4, 2), 16);
                     UnlockCodingBSI();
                 }
             else
                 {
                     textBoxTypBSI.Text = "Unknown " + typbsi;
                     richTextBoxLog.Text += Environment.NewLine + "BSI: " + string.Format(textBoxTypBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Version: " + RefBSIZI[0] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefBSIZI[1] + Environment.NewLine;
                     richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWBSI.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefBSIZI[1]) + "." + string.Format(RefBSIZI[2]) + Environment.NewLine;
-                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBSIZI[4]) + Environment.NewLine;
-                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefBSIZI[2]) + "." + string.Format(RefBSIZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBSIZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefBSIZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefBSIZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefBSIZI[0].Substring(4, 2), 16);
                     UnlockCodingBSI();
                 }
         }
@@ -484,6 +500,7 @@ namespace PSA_CVM2
         }
         public void ButtonIdentifyCVM_Click(object sender, EventArgs e)
         {
+            richTextBoxLog.Text += Environment.NewLine + "Connecting to CVM" + Environment.NewLine;
             string odpowiedz = ConnectModuleUDS(CVM);
             if (odpowiedz.Substring(0, 2) == "OK")
             {
@@ -497,9 +514,21 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + String.Format(odpowiedz) + Environment.NewLine;
                 string odebraneCVMZA = ReadZoneUDS("F080");
                 string odebraneCVMZI = ReadZoneUDS("F0FE");
-                string[] RefCVMZI = { odebraneCVMZI.Substring(26, 2), odebraneCVMZI.Substring(28, 2), odebraneCVMZI.Substring(30, 2), odebraneCVMZI.Substring(32, 6), odebraneCVMZI.Substring(46, 2), odebraneCVMZI.Substring(48, 6) };
-                textBoxSWCVM.Text = "96" + RefCVMZI[5] + "80";
+                string[] RefCVMZI = { odebraneCVMZI.Substring(18, 6), odebraneCVMZI.Substring(26, 2), odebraneCVMZI.Substring(28, 2), odebraneCVMZI.Substring(30, 2), odebraneCVMZI.Substring(32, 6), odebraneCVMZI.Substring(46, 2), odebraneCVMZI.Substring(48, 6) };
+                textBoxSWCVM.Text = "96" + RefCVMZI[6] + "80";
                 textBoxHWCVM.Text = odebraneCVMZA.Substring(20, 10);
+                int TD = Convert.ToInt32(RefCVMZI[4].Substring(0, 2), 16);
+                int TM = Convert.ToInt32(RefCVMZI[4].Substring(2, 2), 16);
+                int TY = Convert.ToInt32(RefCVMZI[4].Substring(4, 2), 16);
+                string TDstring = TD.ToString();
+                string TMstring = TM.ToString();
+                string TYstring = "20" + TY.ToString();
+                if (RefCVMZI[4].Substring(0, 2) == "FF")
+                {
+                    TDstring = RefCVMZI[4].Substring(0, 2);
+                    TMstring = RefCVMZI[4].Substring(2, 2);
+                    TYstring = RefCVMZI[4].Substring(4, 2);
+                }
                 string typcvm = odebraneCVMZA.Substring(47, 3);                                         // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
                 textBoxTypCVM.Text = typcvm;
 
@@ -507,11 +536,13 @@ namespace PSA_CVM2
                 {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                     textBoxTypCVM.Text = "CVM_2";
                     richTextBoxLog.Text += Environment.NewLine + "CVM: " + string.Format(textBoxTypCVM.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Version: " + RefCVMZI[0] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefCVMZI[1] + Environment.NewLine;
                     richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWCVM.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefCVMZI[1]) + "." + string.Format(RefCVMZI[2]) + Environment.NewLine;
-                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCVMZI[4]) + Environment.NewLine;
-                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefCVMZI[2]) + "." + string.Format(RefCVMZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCVMZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefCVMZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefCVMZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefCVMZI[0].Substring(4, 2), 16);
                     string CodingKeyCVM = "E2E5";
                     UnlockCodingCVM();
                 }
@@ -519,22 +550,26 @@ namespace PSA_CVM2
                 {
                     textBoxTypCVM.Text = "CVM_3";
                     richTextBoxLog.Text += Environment.NewLine + "CVM: " + string.Format(textBoxTypCVM.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Version: " + RefCVMZI[0] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefCVMZI[1] + Environment.NewLine;
                     richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWCVM.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefCVMZI[1]) + "." + string.Format(RefCVMZI[2]) + Environment.NewLine;
-                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCVMZI[4]) + Environment.NewLine;
-                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefCVMZI[2]) + "." + string.Format(RefCVMZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCVMZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefCVMZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefCVMZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefCVMZI[0].Substring(4, 2), 16);
                     UnlockCodingCVM();
                 }
                 else
                 {
                     textBoxTypCVM.Text = "Unknown " + typcvm;
                     richTextBoxLog.Text += Environment.NewLine + "CVM: " + string.Format(textBoxTypCVM.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Version: " + RefCVMZI[0] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefCVMZI[1] + Environment.NewLine;
                     richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWCVM.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefCVMZI[1]) + "." + string.Format(RefCVMZI[2]) + Environment.NewLine;
-                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCVMZI[4]) + Environment.NewLine;
-                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefCVMZI[2]) + "." + string.Format(RefCVMZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCVMZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefCVMZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefCVMZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefCVMZI[0].Substring(4, 2), 16);
                     UnlockCodingCVM();
                 }
             }
@@ -659,6 +694,7 @@ namespace PSA_CVM2
         }
         public void ButtonIdentifyDAE_Click(object sender, EventArgs e)
         {
+            richTextBoxLog.Text += Environment.NewLine + "Connecting to DAE" + Environment.NewLine;
             string odpowiedz = ConnectModuleKWP(DAE);
             if (odpowiedz.Substring(0, 2) == "C1")
             {
@@ -712,29 +748,38 @@ namespace PSA_CVM2
         }
         public void ButtonIdentifyAAS_Click(object sender, EventArgs e)
         {
+            richTextBoxLog.Text += Environment.NewLine + "Connecting to AAS" + Environment.NewLine;
             ConnectModuleUDS(AAS);
             string odebraneAASZA = ReadZoneUDS("F080");
             string odebraneAASZI = ReadZoneUDS("F0FE");
-            string[] RefAASZI = { odebraneAASZI.Substring(26, 2), odebraneAASZI.Substring(28, 2), odebraneAASZI.Substring(30, 2), odebraneAASZI.Substring(32, 6), odebraneAASZI.Substring(46, 2), odebraneAASZI.Substring(48, 6) };
-            textBoxSWAAS.Text = "96" + RefAASZI[5] + "80";
+            string[] RefAASZI = { odebraneAASZI.Substring(18, 6), odebraneAASZI.Substring(26, 2), odebraneAASZI.Substring(28, 2), odebraneAASZI.Substring(30, 2), odebraneAASZI.Substring(32, 6), odebraneAASZI.Substring(46, 2), odebraneAASZI.Substring(48, 6) };
+            textBoxSWAAS.Text = "96" + RefAASZI[6] + "80";
             textBoxHWAAS.Text = odebraneAASZA.Substring(20, 10);
+            int TD = Convert.ToInt32(RefAASZI[4].Substring(0, 2), 16);
+            int TM = Convert.ToInt32(RefAASZI[4].Substring(2, 2), 16);
+            int TY = Convert.ToInt32(RefAASZI[4].Substring(4, 2), 16);
+            string TDstring = TD.ToString();
+            string TMstring = TM.ToString();
+            string TYstring = "20" + TY.ToString();
+            if (RefAASZI[4].Substring(0, 2) == "FF")
+            {
+                TDstring = RefAASZI[4].Substring(0, 2);
+                TMstring = RefAASZI[4].Substring(2, 2);
+                TYstring = RefAASZI[4].Substring(4, 2);
+            }
             string typAAS = odebraneAASZA.Substring(46, 4);                                          // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
             textBoxTypAAS.Text = typAAS;
-            //if (typAAS == "xxxx")
-            //{
-            //    textBoxTypAAS.Text = "AAS_UDS_G4";
-            //    string CodingKeyAAS = "0000";
-            //    UnlockCodingAAS();
-            //}
             if (typAAS == "2199")
             {
                 textBoxTypAAS.Text = "AAS_UDS_G5";
                 richTextBoxLog.Text += Environment.NewLine + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefAASZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefAASZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefAASZI[1]) + "." + string.Format(RefAASZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefAASZI[2]) + "." + string.Format(RefAASZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefAASZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefAASZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefAASZI[0].Substring(4, 2), 16);
                 //                string CodingKeyAAS = "0000";
                 UnlockCodingAAS();
             }
@@ -742,11 +787,13 @@ namespace PSA_CVM2
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypAAS.Text = "CPK_UDS_G5";
                 richTextBoxLog.Text += Environment.NewLine + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefAASZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefAASZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefAASZI[1]) + "." + string.Format(RefAASZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefAASZI[2]) + "." + string.Format(RefAASZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefAASZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefAASZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefAASZI[0].Substring(4, 2), 16);
                 string CodingKeyAAS = "D1F5";
                 UnlockCodingAAS();
             }
@@ -754,11 +801,13 @@ namespace PSA_CVM2
             {
                 textBoxTypAAS.Text = "AAS_G4";
                 richTextBoxLog.Text += Environment.NewLine + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefAASZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefAASZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefAASZI[1]) + "." + string.Format(RefAASZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefAASZI[2]) + "." + string.Format(RefAASZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefAASZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefAASZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefAASZI[0].Substring(4, 2), 16);
                 //               string CodingKeyAAS = "xxxx";
                 UnlockCodingAAS();
             }
@@ -766,11 +815,13 @@ namespace PSA_CVM2
             {
                 textBoxTypAAS.Text = "AAS_UDS_G6";
                 richTextBoxLog.Text += Environment.NewLine + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefAASZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefAASZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefAASZI[1]) + "." + string.Format(RefAASZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefAASZI[2]) + "." + string.Format(RefAASZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefAASZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefAASZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefAASZI[0].Substring(4, 2), 16);
                 //               string CodingKeyAAS = "B6F0";
                 UnlockCodingAAS();
             }
@@ -778,11 +829,13 @@ namespace PSA_CVM2
             {
                 textBoxTypAAS.Text = "Unknown " + typAAS;
                 richTextBoxLog.Text += Environment.NewLine + "AAS: " + string.Format(textBoxTypAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefAASZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefAASZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWAAS.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefAASZI[1]) + "." + string.Format(RefAASZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefAASZI[2]) + "." + string.Format(RefAASZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefAASZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefAASZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefAASZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefAASZI[0].Substring(4, 2), 16);
                 UnlockCodingAAS();
             }
         }
@@ -843,6 +896,7 @@ namespace PSA_CVM2
         }
         private void ButtonIdentifyARTIV_Click(object sender, EventArgs e)
         {
+            richTextBoxLog.Text += Environment.NewLine + "Connecting to ARTIV" + Environment.NewLine;
             string odpowiedz = ConnectModuleUDS(ARTIV);
             if (odpowiedz.Substring(0, 2) == "OK")
             {
@@ -855,21 +909,34 @@ namespace PSA_CVM2
             {
                 string odebraneARTIVZA = ReadZoneUDS("F080");
                 string odebraneARTIVZI = ReadZoneUDS("F0FE");
-                string[] RefARTIVZI = { odebraneARTIVZI.Substring(26, 2), odebraneARTIVZI.Substring(28, 2), odebraneARTIVZI.Substring(30, 2), odebraneARTIVZI.Substring(32, 6), odebraneARTIVZI.Substring(46, 2), odebraneARTIVZI.Substring(48, 6) };
-                textBoxSWARTIV.Text = "96" + RefARTIVZI[5] + "80";
+                string[] RefARTIVZI = { odebraneARTIVZI.Substring(18, 6), odebraneARTIVZI.Substring(26, 2), odebraneARTIVZI.Substring(28, 2), odebraneARTIVZI.Substring(30, 2), odebraneARTIVZI.Substring(32, 6), odebraneARTIVZI.Substring(46, 2), odebraneARTIVZI.Substring(48, 6) };
+                textBoxSWARTIV.Text = "96" + RefARTIVZI[6] + "80";
                 textBoxHWARTIV.Text = odebraneARTIVZA.Substring(20, 10);
-
+                int TD = Convert.ToInt32(RefARTIVZI[4].Substring(0, 2), 16);
+                int TM = Convert.ToInt32(RefARTIVZI[4].Substring(2, 2), 16);
+                int TY = Convert.ToInt32(RefARTIVZI[4].Substring(4, 2), 16);
+                string TDstring = TD.ToString();
+                string TMstring = TM.ToString();
+                string TYstring = "20" + TY.ToString();
+                if (RefARTIVZI[4].Substring(0, 2) == "FF")
+                {
+                    TDstring = RefARTIVZI[4].Substring(0, 2);
+                    TMstring = RefARTIVZI[4].Substring(2, 2);
+                    TYstring = RefARTIVZI[4].Substring(4, 2);
+                }
                 string typartiv = odebraneARTIVZA.Substring(47, 3);                                           // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
                 textBoxTypARTIV.Text = typartiv;
                 if (typartiv == "FFF")
                 {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                     textBoxTypARTIV.Text = "ARTIV_UDS";
                     richTextBoxLog.Text += Environment.NewLine + "ARTIV: " + string.Format(textBoxTypARTIV.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Version: " + RefARTIVZI[0] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefARTIVZI[1] + Environment.NewLine;
                     richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWARTIV.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefARTIVZI[1]) + "." + string.Format(RefARTIVZI[2]) + Environment.NewLine;
-                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefARTIVZI[4]) + Environment.NewLine;
-                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefARTIVZI[2]) + "." + string.Format(RefARTIVZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefARTIVZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefARTIVZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefARTIVZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefARTIVZI[0].Substring(4, 2), 16);
                     //string CodingKeyARTIV = "xxxx";
                     UnlockCodingARTIV();
                 }
@@ -877,22 +944,26 @@ namespace PSA_CVM2
                 {
                     textBoxTypARTIV.Text = "RADAR_AV_4";
                     richTextBoxLog.Text += Environment.NewLine + "ARTIV: " + string.Format(textBoxTypARTIV.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Version: " + RefARTIVZI[0] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefARTIVZI[1] + Environment.NewLine;
                     richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWARTIV.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefARTIVZI[1]) + "." + string.Format(RefARTIVZI[2]) + Environment.NewLine;
-                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefARTIVZI[4]) + Environment.NewLine;
-                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefARTIVZI[2]) + "." + string.Format(RefARTIVZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefARTIVZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefARTIVZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefARTIVZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefARTIVZI[0].Substring(4, 2), 16);
                     UnlockCodingARTIV();
                 }
                 else
                 {
                     textBoxTypARTIV.Text = "Unknown " + typartiv;
                     richTextBoxLog.Text += Environment.NewLine + "ARTIV: " + string.Format(textBoxTypARTIV.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Version: " + RefARTIVZI[0] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefARTIVZI[1] + Environment.NewLine;
                     richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWARTIV.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefARTIVZI[1]) + "." + string.Format(RefARTIVZI[2]) + Environment.NewLine;
-                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefARTIVZI[4]) + Environment.NewLine;
-                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefARTIVZI[2]) + "." + string.Format(RefARTIVZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefARTIVZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefARTIVZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefARTIVZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefARTIVZI[0].Substring(4, 2), 16);
                     UnlockCodingARTIV();
                 }
             }
@@ -946,24 +1017,38 @@ namespace PSA_CVM2
         }
         private void ButtonIdentifyCOMBINE_Click(object sender, EventArgs e)
         {
+            richTextBoxLog.Text += Environment.NewLine + "Connecting to COMBINE" + Environment.NewLine;
             ConnectModuleUDS(COMBINE);
             string odebraneCOMBINEZA = ReadZoneUDS("F080");
             string odebraneCOMBINEZI = ReadZoneUDS("F0FE");
-            string[] RefCOMBINEZI = { odebraneCOMBINEZI.Substring(26, 2), odebraneCOMBINEZI.Substring(28, 2), odebraneCOMBINEZI.Substring(30, 2), odebraneCOMBINEZI.Substring(32, 6), odebraneCOMBINEZI.Substring(46, 2), odebraneCOMBINEZI.Substring(48, 6) };
-            textBoxSWCOMBINE.Text = "96" + RefCOMBINEZI[5] + "80";
+            string[] RefCOMBINEZI = { odebraneCOMBINEZI.Substring(18, 6), odebraneCOMBINEZI.Substring(26, 2), odebraneCOMBINEZI.Substring(28, 2), odebraneCOMBINEZI.Substring(30, 2), odebraneCOMBINEZI.Substring(32, 6), odebraneCOMBINEZI.Substring(46, 2), odebraneCOMBINEZI.Substring(48, 6) };
+            textBoxSWCOMBINE.Text = "96" + RefCOMBINEZI[6] + "80";
             textBoxHWCOMBINE.Text = odebraneCOMBINEZA.Substring(20, 10);
-
+            int TD = Convert.ToInt32(RefCOMBINEZI[4].Substring(0, 2), 16);
+            int TM = Convert.ToInt32(RefCOMBINEZI[4].Substring(2, 2), 16);
+            int TY = Convert.ToInt32(RefCOMBINEZI[4].Substring(4, 2), 16);
+            string TDstring = TD.ToString();
+            string TMstring = TM.ToString();
+            string TYstring = "20" + TY.ToString();
+            if (RefCOMBINEZI[4].Substring(0, 2) == "FF")
+            {
+                TDstring = RefCOMBINEZI[4].Substring(0, 2);
+                TMstring = RefCOMBINEZI[4].Substring(2, 2);
+                TYstring = RefCOMBINEZI[4].Substring(4, 2);
+            }
             string typcombine = odebraneCOMBINEZI.Substring(14, 4);
             textBoxTypCOMBINE.Text = typcombine;
             if (typcombine == "02FC")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypCOMBINE.Text = "CIROCCO";
                 richTextBoxLog.Text += Environment.NewLine + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefCOMBINEZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefCOMBINEZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefCOMBINEZI[1]) + "." + string.Format(RefCOMBINEZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCOMBINEZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefCOMBINEZI[2]) + "." + string.Format(RefCOMBINEZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCOMBINEZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefCOMBINEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefCOMBINEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefCOMBINEZI[0].Substring(4, 2), 16);
                 CodingKeyCOMBINE = "FAFA";
                 UnlockCodingCOMBINE();
             }
@@ -971,22 +1056,26 @@ namespace PSA_CVM2
             {
                 textBoxTypCOMBINE.Text = "COMBINE_UDS_EV";
                 richTextBoxLog.Text += Environment.NewLine + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefCOMBINEZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefCOMBINEZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefCOMBINEZI[1]) + "." + string.Format(RefCOMBINEZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCOMBINEZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefCOMBINEZI[2]) + "." + string.Format(RefCOMBINEZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCOMBINEZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefCOMBINEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefCOMBINEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefCOMBINEZI[0].Substring(4, 2), 16);
                 UnlockCodingCOMBINE();
             }
             else
             {
                 textBoxTypCOMBINE.Text = "Unknown " + typcombine;
                 richTextBoxLog.Text += Environment.NewLine + "COMBINE: " + string.Format(textBoxTypCOMBINE.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefCOMBINEZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefCOMBINEZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWCOMBINE.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefCOMBINEZI[1]) + "." + string.Format(RefCOMBINEZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCOMBINEZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefCOMBINEZI[2]) + "." + string.Format(RefCOMBINEZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCOMBINEZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefCOMBINEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefCOMBINEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefCOMBINEZI[0].Substring(4, 2), 16);
                 UnlockCodingCOMBINE();
             }
         }
@@ -1020,24 +1109,38 @@ namespace PSA_CVM2
         }
         private void ButtonIdentifyTELEMAT_Click(object sender, EventArgs e)
         {
+            richTextBoxLog.Text += Environment.NewLine + "Connecting to TELEMAT" + Environment.NewLine;
             ConnectModuleUDS(TELEMAT);
             string odebraneTELEMATZA = ReadZoneUDS("F080");
             string odebraneTELEMATZI = ReadZoneUDS("F0FE");
-            string[] RefTELEMATZI = { odebraneTELEMATZI.Substring(26, 2), odebraneTELEMATZI.Substring(28, 2), odebraneTELEMATZI.Substring(30, 2), odebraneTELEMATZI.Substring(32, 6), odebraneTELEMATZI.Substring(46, 2), odebraneTELEMATZI.Substring(48, 6) };
-            textBoxSWTELEMAT.Text = "96" + RefTELEMATZI[5] + "80";
+            string[] RefTELEMATZI = { odebraneTELEMATZI.Substring(18, 6), odebraneTELEMATZI.Substring(26, 2), odebraneTELEMATZI.Substring(28, 2), odebraneTELEMATZI.Substring(30, 2), odebraneTELEMATZI.Substring(32, 6), odebraneTELEMATZI.Substring(46, 2), odebraneTELEMATZI.Substring(48, 6) };
+            textBoxSWTELEMAT.Text = "96" + RefTELEMATZI[6] + "80";
             textBoxHWTELEMAT.Text = odebraneTELEMATZA.Substring(20, 10);
-
+            int TD = Convert.ToInt32(RefTELEMATZI[4].Substring(0, 2), 16);
+            int TM = Convert.ToInt32(RefTELEMATZI[4].Substring(2, 2), 16);
+            int TY = Convert.ToInt32(RefTELEMATZI[4].Substring(4, 2), 16);
+            string TDstring = TD.ToString();
+            string TMstring = TM.ToString();
+            string TYstring = "20" + TY.ToString();
+            if (RefTELEMATZI[4].Substring(0, 2) == "FF")
+            {
+                TDstring = RefTELEMATZI[4].Substring(0, 2);
+                TMstring = RefTELEMATZI[4].Substring(2, 2);
+                TYstring = RefTELEMATZI[4].Substring(4, 2);
+            }
             string typtelemat = odebraneTELEMATZI.Substring(14, 4);
             textBoxTypTELEMAT.Text = typtelemat;
             if (typtelemat == "0DF5")
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypTELEMAT.Text = "NAC";
                 richTextBoxLog.Text += Environment.NewLine + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefTELEMATZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefTELEMATZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefTELEMATZI[1]) + "." + string.Format(RefTELEMATZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefTELEMATZI[2]) + "." + string.Format(RefTELEMATZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefTELEMATZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefTELEMATZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefTELEMATZI[0].Substring(4, 2), 16);
                 CodingKeyTELEMAT = "D91C";
                 UnlockCodingTELEMAT();
             }
@@ -1045,11 +1148,13 @@ namespace PSA_CVM2
             {
                 textBoxTypTELEMAT.Text = "RCC";
                 richTextBoxLog.Text += Environment.NewLine + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefTELEMATZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefTELEMATZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefTELEMATZI[1]) + "." + string.Format(RefTELEMATZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefTELEMATZI[2]) + "." + string.Format(RefTELEMATZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefTELEMATZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefTELEMATZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefTELEMATZI[0].Substring(4, 2), 16);
                 CodingKeyTELEMAT = "F107";
                 UnlockCodingTELEMAT();
             }
@@ -1057,11 +1162,13 @@ namespace PSA_CVM2
             {
                 textBoxTypTELEMAT.Text = "Unknown " + typtelemat;
                 richTextBoxLog.Text += Environment.NewLine + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefTELEMATZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefTELEMATZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefTELEMATZI[1]) + "." + string.Format(RefTELEMATZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefTELEMATZI[2]) + "." + string.Format(RefTELEMATZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefTELEMATZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefTELEMATZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefTELEMATZI[0].Substring(4, 2), 16);
                 UnlockCodingTELEMAT();
             }
         }
@@ -1095,23 +1202,38 @@ namespace PSA_CVM2
         }
         private void ButtonIdentifyINJ_Click(object sender, EventArgs e)
         {
+            richTextBoxLog.Text += Environment.NewLine + "Connecting to INJ" + Environment.NewLine;
             ConnectModuleUDS(INJ);
             string odebraneINJZA = ReadZoneUDS("F080");
             string odebraneINJZI = ReadZoneUDS("F0FE");
-            string[] RefINJZI = { odebraneINJZI.Substring(26, 2), odebraneINJZI.Substring(28, 2), odebraneINJZI.Substring(30, 2), odebraneINJZI.Substring(32, 6), odebraneINJZI.Substring(46, 2), odebraneINJZI.Substring(48, 6) };
-            textBoxSWINJ.Text = "96" + RefINJZI[5] + "80";
+            string[] RefINJZI = { odebraneINJZI.Substring(18, 6), odebraneINJZI.Substring(26, 2), odebraneINJZI.Substring(28, 2), odebraneINJZI.Substring(30, 2), odebraneINJZI.Substring(32, 6), odebraneINJZI.Substring(46, 2), odebraneINJZI.Substring(48, 6) };
+            textBoxSWINJ.Text = "96" + RefINJZI[6] + "80";
             textBoxHWINJ.Text = odebraneINJZA.Substring(20, 10);
+            int TD = Convert.ToInt32(RefINJZI[4].Substring(0, 2), 16);
+            int TM = Convert.ToInt32(RefINJZI[4].Substring(2, 2), 16);
+            int TY = Convert.ToInt32(RefINJZI[4].Substring(4, 2), 16);
+            string TDstring = TD.ToString();
+            string TMstring = TM.ToString();
+            string TYstring = "20" + TY.ToString();
+            if (RefINJZI[4].Substring(0, 2) == "FF")
+            {
+                TDstring = RefINJZI[4].Substring(0, 2);
+                TMstring = RefINJZI[4].Substring(2, 2);
+                TYstring = RefINJZI[4].Substring(4, 2);
+            }
             string typINJ = odebraneINJZI.Substring(14, 4);                                          // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
             textBoxTypINJ.Text = typINJ;
             if (typINJ == "0326")
             {
                 textBoxTypINJ.Text = "CMM_MG1CS042";
                 richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[1]) + "." + string.Format(RefINJZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[2]) + "." + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
@@ -1119,11 +1241,13 @@ namespace PSA_CVM2
             {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
                 textBoxTypINJ.Text = "CMM_VD56";
                 richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[1]) + "." + string.Format(RefINJZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[2]) + "." + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
@@ -1131,11 +1255,13 @@ namespace PSA_CVM2
             {
                 textBoxTypINJ.Text = "CMM_MD1CS003_EURO6_3";
                 richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[1]) + "." + string.Format(RefINJZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[2]) + "." + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
@@ -1143,11 +1269,13 @@ namespace PSA_CVM2
             {
                 textBoxTypINJ.Text = "CMM_MG1CS042_PHEV";
                 richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[1]) + "." + string.Format(RefINJZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[2]) + "." + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
@@ -1155,11 +1283,13 @@ namespace PSA_CVM2
             {
                 textBoxTypINJ.Text = "CMM_DCM71";
                 richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[1]) + "." + string.Format(RefINJZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[2]) + "." + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
@@ -1167,11 +1297,13 @@ namespace PSA_CVM2
             {
                 textBoxTypINJ.Text = "Unknown " + typINJ;
                 richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[1]) + "." + string.Format(RefINJZI[2]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[4]) + Environment.NewLine;
-                richTextBoxLog.Text += "HW: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[2]) + "." + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
                 UnlockCodingINJ();
             }
         }
@@ -1203,8 +1335,9 @@ namespace PSA_CVM2
                 textBoxInfo.Text = "Please select zone";
             }
         }
-        private void buttonIdentifyBVA_Click(object sender, EventArgs e)
+        private void ButtonIdentifyBVA_Click(object sender, EventArgs e)
         {
+            richTextBoxLog.Text += Environment.NewLine + "Connecting to BVA" + Environment.NewLine;
             string odpowiedz = ConnectModuleUDS(BVA);
             if (odpowiedz.Substring(0, 2) == "OK")
             {
@@ -1217,36 +1350,52 @@ namespace PSA_CVM2
             {
                 string odebraneBVAZA = ReadZoneUDS("F080");
                 string odebraneBVAZI = ReadZoneUDS("F0FE");
-                string[] RefBVAZI = { odebraneBVAZI.Substring(26, 2), odebraneBVAZI.Substring(28, 2), odebraneBVAZI.Substring(30, 2), odebraneBVAZI.Substring(32, 6), odebraneBVAZI.Substring(46, 2), odebraneBVAZI.Substring(48, 6) };
-                textBoxSWBVA.Text = "96" + RefBVAZI[5] + "80";
+                string[] RefBVAZI = { odebraneBVAZI.Substring(18, 6), odebraneBVAZI.Substring(26, 2), odebraneBVAZI.Substring(28, 2), odebraneBVAZI.Substring(30, 2), odebraneBVAZI.Substring(32, 6), odebraneBVAZI.Substring(46, 2), odebraneBVAZI.Substring(48, 6) };
+                textBoxSWBVA.Text = "96" + RefBVAZI[6] + "80";
                 textBoxHWBVA.Text = odebraneBVAZA.Substring(20, 10);
+                int TD = Convert.ToInt32(RefBVAZI[4].Substring(0, 2), 16);
+                int TM = Convert.ToInt32(RefBVAZI[4].Substring(2, 2), 16);
+                int TY = Convert.ToInt32(RefBVAZI[4].Substring(4, 2), 16);
+                string TDstring = TD.ToString();
+                string TMstring = TM.ToString();
+                string TYstring = "20" + TY.ToString();
+                if (RefBVAZI[4].Substring(0, 2) == "FF")
+                {
+                    TDstring = RefBVAZI[4].Substring(0, 2);
+                    TMstring = RefBVAZI[4].Substring(2, 2);
+                    TYstring = RefBVAZI[4].Substring(4, 2);
+                }
                 string typbva = odebraneBVAZI.Substring(14, 4);
                 textBoxTypBVA.Text = typbva;
                 if (typbva == "3060")
                 {
                     textBoxTypBVA.Text = "BVA AXN8";
                     richTextBoxLog.Text += Environment.NewLine + "BVA: " + string.Format(textBoxTypBVA.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Version: " + RefBVAZI[0] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefBVAZI[1] + Environment.NewLine;
                     richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWBVA.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefBVAZI[1]) + "." + string.Format(RefBVAZI[2]) + Environment.NewLine;
-                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBVAZI[4]) + Environment.NewLine;
-                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWBVA.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefBVAZI[2]) + "." + string.Format(RefBVAZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBVAZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWBVA.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefBVAZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefBVAZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefBVAZI[0].Substring(4, 2), 16);
                     UnlockCodingBVA();
                 }
                 else
                 {
                     textBoxTypBVA.Text = "Unknown " + typbva;
                     richTextBoxLog.Text += Environment.NewLine + "BVA: " + string.Format(textBoxTypBVA.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Version: " + RefBVAZI[0] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefBVAZI[1] + Environment.NewLine;
                     richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWBVA.Text) + Environment.NewLine;
-                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefBVAZI[1]) + "." + string.Format(RefBVAZI[2]) + Environment.NewLine;
-                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBVAZI[4]) + Environment.NewLine;
-                    richTextBoxLog.Text += "HW: " + string.Format(textBoxHWBVA.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefBVAZI[2]) + "." + string.Format(RefBVAZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBVAZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWBVA.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefBVAZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefBVAZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefBVAZI[0].Substring(4, 2), 16);
                     UnlockCodingBVA();
                 }
             }
         }
-        private void buttonReadZoneBVA_Click(object sender, EventArgs e)
+        private void ButtonReadZoneBVA_Click(object sender, EventArgs e)
         {
             if (textBoxZoneBVA.Text != "")
             {
@@ -1401,8 +1550,8 @@ namespace PSA_CVM2
         }
         public void ButtonAlgo_Click(object sender, EventArgs e)
         {
-            ConnectModuleUDS(BSI);
-            /*string str = "34A00000000605" + textBoxNewCodingDAE.Text + "FD000000";
+            /*//ConnectModuleUDS(BSI);
+            string str = "34A00000000605" + textBoxNewCodingDAE.Text + "FD000000";
             byte[] BTS = StringToByteArray(str);
             ushort calc_crc = Crc16_x25(BTS, BTS.Length);
 
@@ -1442,6 +1591,7 @@ namespace PSA_CVM2
                         }
                         sw.Flush();
                         sw.Close();
+                        MessageBox.Show("Log saved");
                     }
                 }
             }

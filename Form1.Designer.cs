@@ -415,7 +415,7 @@ namespace PSA_CVM2
             // 
             this.spArduino.BaudRate = 115200;
             this.spArduino.PortName = "COM5";
-            this.spArduino.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.SpArduino_DataReceived);
+            this.spArduino.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.DataReceivedHandler);
             // 
             // textBoxInfo
             // 
@@ -1932,7 +1932,7 @@ namespace PSA_CVM2
             this.buttonReadZoneBVA.TabIndex = 80;
             this.buttonReadZoneBVA.Text = "Read Zone";
             this.buttonReadZoneBVA.UseVisualStyleBackColor = true;
-            this.buttonReadZoneBVA.Click += new System.EventHandler(this.buttonReadZoneBVA_Click);
+            this.buttonReadZoneBVA.Click += new System.EventHandler(this.ButtonReadZoneBVA_Click);
             // 
             // textBoxHWBVA
             // 
@@ -1991,7 +1991,7 @@ namespace PSA_CVM2
             this.buttonIdentifyBVA.TabIndex = 73;
             this.buttonIdentifyBVA.Text = "Identify";
             this.buttonIdentifyBVA.UseVisualStyleBackColor = true;
-            this.buttonIdentifyBVA.Click += new System.EventHandler(this.buttonIdentifyBVA_Click);
+            this.buttonIdentifyBVA.Click += new System.EventHandler(this.ButtonIdentifyBVA_Click);
             // 
             // Form1
             // 
@@ -2002,7 +2002,7 @@ namespace PSA_CVM2
             this.Controls.Add(this.textBoxInfo);
             this.Controls.Add(this.panel1);
             this.Name = "Form1";
-            this.Text = "PSA Arduino 04.03.2024";
+            this.Text = "PSA Arduino 12.03.2024";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.tabControl1.ResumeLayout(false);
