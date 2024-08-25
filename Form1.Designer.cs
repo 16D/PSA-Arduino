@@ -33,6 +33,11 @@ namespace PSA_CVM2
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.buttonClearFaults = new System.Windows.Forms.Button();
+            this.buttonReadFaults = new System.Windows.Forms.Button();
+            this.label61 = new System.Windows.Forms.Label();
+            this.label60 = new System.Windows.Forms.Label();
+            this.textBoxmileage = new System.Windows.Forms.TextBox();
             this.buttonSaveLog = new System.Windows.Forms.Button();
             this.label28 = new System.Windows.Forms.Label();
             this.label27 = new System.Windows.Forms.Label();
@@ -95,14 +100,14 @@ namespace PSA_CVM2
             this.button7 = new System.Windows.Forms.Button();
             this.label52 = new System.Windows.Forms.Label();
             this.label53 = new System.Windows.Forms.Label();
-            this.textBox12 = new System.Windows.Forms.TextBox();
-            this.textBox13 = new System.Windows.Forms.TextBox();
-            this.button8 = new System.Windows.Forms.Button();
+            this.textBoxZoneDAE = new System.Windows.Forms.TextBox();
+            this.textBoxZoneValueDAE = new System.Windows.Forms.TextBox();
+            this.buttonReadZoneDAE = new System.Windows.Forms.Button();
             this.textBoxNewCodingDAE = new System.Windows.Forms.TextBox();
             this.buttonWriteCodingDAE = new System.Windows.Forms.Button();
             this.textBoxDAECoding = new System.Windows.Forms.TextBox();
             this.buttonReadCodingDAE = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBoxHWDAE = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -113,9 +118,9 @@ namespace PSA_CVM2
             this.label49 = new System.Windows.Forms.Label();
             this.textBox7 = new System.Windows.Forms.TextBox();
             this.button5 = new System.Windows.Forms.Button();
-            this.textBox9 = new System.Windows.Forms.TextBox();
+            this.textBoxAASNewCoding = new System.Windows.Forms.TextBox();
             this.buttonWriteCodingAAS = new System.Windows.Forms.Button();
-            this.textBoxCodingAAS = new System.Windows.Forms.TextBox();
+            this.textBoxAASCoding = new System.Windows.Forms.TextBox();
             this.buttonReadCodingAAS = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
@@ -167,6 +172,11 @@ namespace PSA_CVM2
             this.textBoxTypCOMBINE = new System.Windows.Forms.TextBox();
             this.buttonIdentifyCOMBINE = new System.Windows.Forms.Button();
             this.tabPage7 = new System.Windows.Forms.TabPage();
+            this.label62 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.button11 = new System.Windows.Forms.Button();
+            this.button10 = new System.Windows.Forms.Button();
+            this.button8 = new System.Windows.Forms.Button();
             this.label46 = new System.Windows.Forms.Label();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
@@ -223,12 +233,18 @@ namespace PSA_CVM2
             this.tabPage5.SuspendLayout();
             this.tabPage6.SuspendLayout();
             this.tabPage7.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.tabPage8.SuspendLayout();
             this.tabPage9.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.buttonClearFaults);
+            this.panel1.Controls.Add(this.buttonReadFaults);
+            this.panel1.Controls.Add(this.label61);
+            this.panel1.Controls.Add(this.label60);
+            this.panel1.Controls.Add(this.textBoxmileage);
             this.panel1.Controls.Add(this.buttonSaveLog);
             this.panel1.Controls.Add(this.label28);
             this.panel1.Controls.Add(this.label27);
@@ -249,6 +265,51 @@ namespace PSA_CVM2
             this.panel1.Size = new System.Drawing.Size(517, 466);
             this.panel1.TabIndex = 0;
             // 
+            // buttonClearFaults
+            // 
+            this.buttonClearFaults.Enabled = false;
+            this.buttonClearFaults.Location = new System.Drawing.Point(395, 89);
+            this.buttonClearFaults.Name = "buttonClearFaults";
+            this.buttonClearFaults.Size = new System.Drawing.Size(108, 23);
+            this.buttonClearFaults.TabIndex = 27;
+            this.buttonClearFaults.Text = "Clear faults";
+            this.buttonClearFaults.Click += new System.EventHandler(this.ButtonClearFaults_Click);
+            // 
+            // buttonReadFaults
+            // 
+            this.buttonReadFaults.Enabled = false;
+            this.buttonReadFaults.Location = new System.Drawing.Point(281, 89);
+            this.buttonReadFaults.Name = "buttonReadFaults";
+            this.buttonReadFaults.Size = new System.Drawing.Size(108, 23);
+            this.buttonReadFaults.TabIndex = 26;
+            this.buttonReadFaults.Text = "Read faults";
+            this.buttonReadFaults.Click += new System.EventHandler(this.ButtonReadFaults_Click);
+            // 
+            // label61
+            // 
+            this.label61.AutoSize = true;
+            this.label61.Location = new System.Drawing.Point(93, 41);
+            this.label61.Name = "label61";
+            this.label61.Size = new System.Drawing.Size(32, 16);
+            this.label61.TabIndex = 19;
+            this.label61.Text = "VIN:";
+            // 
+            // label60
+            // 
+            this.label60.AutoSize = true;
+            this.label60.Location = new System.Drawing.Point(338, 41);
+            this.label60.Name = "label60";
+            this.label60.Size = new System.Drawing.Size(59, 16);
+            this.label60.TabIndex = 18;
+            this.label60.Text = "Mileage:";
+            // 
+            // textBoxmileage
+            // 
+            this.textBoxmileage.Location = new System.Drawing.Point(403, 38);
+            this.textBoxmileage.Name = "textBoxmileage";
+            this.textBoxmileage.Size = new System.Drawing.Size(100, 22);
+            this.textBoxmileage.TabIndex = 17;
+            // 
             // buttonSaveLog
             // 
             this.buttonSaveLog.Location = new System.Drawing.Point(262, 438);
@@ -262,7 +323,7 @@ namespace PSA_CVM2
             // label28
             // 
             this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(278, 70);
+            this.label28.Location = new System.Drawing.Point(186, 70);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(33, 16);
             this.label28.TabIndex = 14;
@@ -271,7 +332,7 @@ namespace PSA_CVM2
             // label27
             // 
             this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(161, 71);
+            this.label27.Location = new System.Drawing.Point(93, 70);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(44, 16);
             this.label27.TabIndex = 13;
@@ -279,17 +340,17 @@ namespace PSA_CVM2
             // 
             // textBoxKey
             // 
-            this.textBoxKey.Location = new System.Drawing.Point(254, 89);
+            this.textBoxKey.Location = new System.Drawing.Point(162, 89);
             this.textBoxKey.Name = "textBoxKey";
-            this.textBoxKey.Size = new System.Drawing.Size(100, 22);
+            this.textBoxKey.Size = new System.Drawing.Size(80, 22);
             this.textBoxKey.TabIndex = 12;
             this.textBoxKey.Text = "FAFA";
             // 
             // textBoxSeed
             // 
-            this.textBoxSeed.Location = new System.Drawing.Point(131, 89);
+            this.textBoxSeed.Location = new System.Drawing.Point(76, 89);
             this.textBoxSeed.Name = "textBoxSeed";
-            this.textBoxSeed.Size = new System.Drawing.Size(100, 22);
+            this.textBoxSeed.Size = new System.Drawing.Size(80, 22);
             this.textBoxSeed.TabIndex = 11;
             this.textBoxSeed.Text = "F0F07A5B";
             // 
@@ -297,7 +358,7 @@ namespace PSA_CVM2
             // 
             this.buttonAlgo.Location = new System.Drawing.Point(5, 68);
             this.buttonAlgo.Name = "buttonAlgo";
-            this.buttonAlgo.Size = new System.Drawing.Size(104, 23);
+            this.buttonAlgo.Size = new System.Drawing.Size(65, 43);
             this.buttonAlgo.TabIndex = 10;
             this.buttonAlgo.Text = "Test algo";
             this.buttonAlgo.UseVisualStyleBackColor = true;
@@ -335,7 +396,7 @@ namespace PSA_CVM2
             this.buttonIdentifyVIN.Enabled = false;
             this.buttonIdentifyVIN.Location = new System.Drawing.Point(3, 37);
             this.buttonIdentifyVIN.Name = "buttonIdentifyVIN";
-            this.buttonIdentifyVIN.Size = new System.Drawing.Size(110, 24);
+            this.buttonIdentifyVIN.Size = new System.Drawing.Size(86, 24);
             this.buttonIdentifyVIN.TabIndex = 4;
             this.buttonIdentifyVIN.Text = "Read VIN";
             this.buttonIdentifyVIN.UseVisualStyleBackColor = true;
@@ -392,7 +453,7 @@ namespace PSA_CVM2
             // buttonStartCodingBSI
             // 
             this.buttonStartCodingBSI.Enabled = false;
-            this.buttonStartCodingBSI.Location = new System.Drawing.Point(406, 147);
+            this.buttonStartCodingBSI.Location = new System.Drawing.Point(406, 180);
             this.buttonStartCodingBSI.Name = "buttonStartCodingBSI";
             this.buttonStartCodingBSI.Size = new System.Drawing.Size(108, 23);
             this.buttonStartCodingBSI.TabIndex = 3;
@@ -421,7 +482,7 @@ namespace PSA_CVM2
             // 
             this.textBoxInfo.Location = new System.Drawing.Point(4, 12);
             this.textBoxInfo.Name = "textBoxInfo";
-            this.textBoxInfo.Size = new System.Drawing.Size(784, 22);
+            this.textBoxInfo.Size = new System.Drawing.Size(513, 22);
             this.textBoxInfo.TabIndex = 6;
             // 
             // tabControl1
@@ -435,10 +496,10 @@ namespace PSA_CVM2
             this.tabControl1.Controls.Add(this.tabPage7);
             this.tabControl1.Controls.Add(this.tabPage8);
             this.tabControl1.Controls.Add(this.tabPage9);
-            this.tabControl1.Location = new System.Drawing.Point(523, 40);
+            this.tabControl1.Location = new System.Drawing.Point(523, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(542, 466);
+            this.tabControl1.Size = new System.Drawing.Size(542, 494);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
@@ -463,7 +524,7 @@ namespace PSA_CVM2
             this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(534, 437);
+            this.tabPage1.Size = new System.Drawing.Size(534, 465);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "BSI";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -471,12 +532,13 @@ namespace PSA_CVM2
             // buttonWriteZoneBSI
             // 
             this.buttonWriteZoneBSI.Enabled = false;
-            this.buttonWriteZoneBSI.Location = new System.Drawing.Point(297, 147);
+            this.buttonWriteZoneBSI.Location = new System.Drawing.Point(297, 180);
             this.buttonWriteZoneBSI.Name = "buttonWriteZoneBSI";
             this.buttonWriteZoneBSI.Size = new System.Drawing.Size(103, 23);
             this.buttonWriteZoneBSI.TabIndex = 25;
             this.buttonWriteZoneBSI.Text = "Write Zone";
             this.buttonWriteZoneBSI.UseVisualStyleBackColor = true;
+            this.buttonWriteZoneBSI.Click += new System.EventHandler(this.ButtonWriteZoneBSI_Click);
             // 
             // label29
             // 
@@ -526,14 +588,14 @@ namespace PSA_CVM2
             this.textBoxZoneNewValueBSI.Location = new System.Drawing.Point(136, 148);
             this.textBoxZoneNewValueBSI.Name = "textBoxZoneNewValueBSI";
             this.textBoxZoneNewValueBSI.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.textBoxZoneNewValueBSI.Size = new System.Drawing.Size(145, 22);
+            this.textBoxZoneNewValueBSI.Size = new System.Drawing.Size(378, 22);
             this.textBoxZoneNewValueBSI.TabIndex = 16;
             // 
             // textBoxZoneValueBSI
             // 
             this.textBoxZoneValueBSI.Location = new System.Drawing.Point(136, 120);
             this.textBoxZoneValueBSI.Name = "textBoxZoneValueBSI";
-            this.textBoxZoneValueBSI.Size = new System.Drawing.Size(264, 22);
+            this.textBoxZoneValueBSI.Size = new System.Drawing.Size(378, 22);
             this.textBoxZoneValueBSI.TabIndex = 14;
             // 
             // textBoxHWBSI
@@ -618,7 +680,7 @@ namespace PSA_CVM2
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(534, 437);
+            this.tabPage2.Size = new System.Drawing.Size(534, 465);
             this.tabPage2.TabIndex = 2;
             this.tabPage2.Text = "CVM";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -795,14 +857,14 @@ namespace PSA_CVM2
             this.tabPage3.Controls.Add(this.button7);
             this.tabPage3.Controls.Add(this.label52);
             this.tabPage3.Controls.Add(this.label53);
-            this.tabPage3.Controls.Add(this.textBox12);
-            this.tabPage3.Controls.Add(this.textBox13);
-            this.tabPage3.Controls.Add(this.button8);
+            this.tabPage3.Controls.Add(this.textBoxZoneDAE);
+            this.tabPage3.Controls.Add(this.textBoxZoneValueDAE);
+            this.tabPage3.Controls.Add(this.buttonReadZoneDAE);
             this.tabPage3.Controls.Add(this.textBoxNewCodingDAE);
             this.tabPage3.Controls.Add(this.buttonWriteCodingDAE);
             this.tabPage3.Controls.Add(this.textBoxDAECoding);
             this.tabPage3.Controls.Add(this.buttonReadCodingDAE);
-            this.tabPage3.Controls.Add(this.textBox1);
+            this.tabPage3.Controls.Add(this.textBoxHWDAE);
             this.tabPage3.Controls.Add(this.label10);
             this.tabPage3.Controls.Add(this.label11);
             this.tabPage3.Controls.Add(this.label12);
@@ -812,7 +874,7 @@ namespace PSA_CVM2
             this.tabPage3.Location = new System.Drawing.Point(4, 25);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(534, 437);
+            this.tabPage3.Size = new System.Drawing.Size(534, 465);
             this.tabPage3.TabIndex = 3;
             this.tabPage3.Text = "DAE";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -862,29 +924,30 @@ namespace PSA_CVM2
             this.label53.TabIndex = 67;
             this.label53.Text = "Zone:";
             // 
-            // textBox12
+            // textBoxZoneDAE
             // 
-            this.textBox12.Location = new System.Drawing.Point(136, 159);
-            this.textBox12.Name = "textBox12";
-            this.textBox12.Size = new System.Drawing.Size(100, 22);
-            this.textBox12.TabIndex = 66;
+            this.textBoxZoneDAE.Location = new System.Drawing.Point(136, 159);
+            this.textBoxZoneDAE.Name = "textBoxZoneDAE";
+            this.textBoxZoneDAE.Size = new System.Drawing.Size(100, 22);
+            this.textBoxZoneDAE.TabIndex = 66;
             // 
-            // textBox13
+            // textBoxZoneValueDAE
             // 
-            this.textBox13.Location = new System.Drawing.Point(136, 187);
-            this.textBox13.Name = "textBox13";
-            this.textBox13.Size = new System.Drawing.Size(264, 22);
-            this.textBox13.TabIndex = 65;
+            this.textBoxZoneValueDAE.Location = new System.Drawing.Point(136, 187);
+            this.textBoxZoneValueDAE.Name = "textBoxZoneValueDAE";
+            this.textBoxZoneValueDAE.Size = new System.Drawing.Size(264, 22);
+            this.textBoxZoneValueDAE.TabIndex = 65;
             // 
-            // button8
+            // buttonReadZoneDAE
             // 
-            this.button8.Enabled = false;
-            this.button8.Location = new System.Drawing.Point(292, 159);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(108, 23);
-            this.button8.TabIndex = 64;
-            this.button8.Text = "Read Zone";
-            this.button8.UseVisualStyleBackColor = true;
+            this.buttonReadZoneDAE.Enabled = false;
+            this.buttonReadZoneDAE.Location = new System.Drawing.Point(292, 159);
+            this.buttonReadZoneDAE.Name = "buttonReadZoneDAE";
+            this.buttonReadZoneDAE.Size = new System.Drawing.Size(108, 23);
+            this.buttonReadZoneDAE.TabIndex = 64;
+            this.buttonReadZoneDAE.Text = "Read Zone";
+            this.buttonReadZoneDAE.UseVisualStyleBackColor = true;
+            this.buttonReadZoneDAE.Click += new System.EventHandler(this.ButtonReadZoneDAE_Click);
             // 
             // textBoxNewCodingDAE
             // 
@@ -922,12 +985,12 @@ namespace PSA_CVM2
             this.buttonReadCodingDAE.UseVisualStyleBackColor = true;
             this.buttonReadCodingDAE.Click += new System.EventHandler(this.ButtonReadCodingDAE_Click);
             // 
-            // textBox1
+            // textBoxHWDAE
             // 
-            this.textBox1.Location = new System.Drawing.Point(250, 57);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(150, 22);
-            this.textBox1.TabIndex = 24;
+            this.textBoxHWDAE.Location = new System.Drawing.Point(250, 57);
+            this.textBoxHWDAE.Name = "textBoxHWDAE";
+            this.textBoxHWDAE.Size = new System.Drawing.Size(150, 22);
+            this.textBoxHWDAE.TabIndex = 24;
             // 
             // label10
             // 
@@ -986,9 +1049,9 @@ namespace PSA_CVM2
             this.tabPage4.Controls.Add(this.label49);
             this.tabPage4.Controls.Add(this.textBox7);
             this.tabPage4.Controls.Add(this.button5);
-            this.tabPage4.Controls.Add(this.textBox9);
+            this.tabPage4.Controls.Add(this.textBoxAASNewCoding);
             this.tabPage4.Controls.Add(this.buttonWriteCodingAAS);
-            this.tabPage4.Controls.Add(this.textBoxCodingAAS);
+            this.tabPage4.Controls.Add(this.textBoxAASCoding);
             this.tabPage4.Controls.Add(this.buttonReadCodingAAS);
             this.tabPage4.Controls.Add(this.label5);
             this.tabPage4.Controls.Add(this.label6);
@@ -1005,7 +1068,7 @@ namespace PSA_CVM2
             this.tabPage4.Location = new System.Drawing.Point(4, 25);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(534, 437);
+            this.tabPage4.Size = new System.Drawing.Size(534, 465);
             this.tabPage4.TabIndex = 4;
             this.tabPage4.Text = "AAS";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -1037,12 +1100,12 @@ namespace PSA_CVM2
             this.button5.Text = "Write";
             this.button5.UseVisualStyleBackColor = true;
             // 
-            // textBox9
+            // textBoxAASNewCoding
             // 
-            this.textBox9.Location = new System.Drawing.Point(136, 121);
-            this.textBox9.Name = "textBox9";
-            this.textBox9.Size = new System.Drawing.Size(264, 22);
-            this.textBox9.TabIndex = 42;
+            this.textBoxAASNewCoding.Location = new System.Drawing.Point(136, 121);
+            this.textBoxAASNewCoding.Name = "textBoxAASNewCoding";
+            this.textBoxAASNewCoding.Size = new System.Drawing.Size(264, 22);
+            this.textBoxAASNewCoding.TabIndex = 42;
             // 
             // buttonWriteCodingAAS
             // 
@@ -1053,13 +1116,14 @@ namespace PSA_CVM2
             this.buttonWriteCodingAAS.TabIndex = 41;
             this.buttonWriteCodingAAS.Text = "Write Coding";
             this.buttonWriteCodingAAS.UseVisualStyleBackColor = true;
+            this.buttonWriteCodingAAS.Click += new System.EventHandler(this.ButtonWriteCodingAAS_Click);
             // 
-            // textBoxCodingAAS
+            // textBoxAASCoding
             // 
-            this.textBoxCodingAAS.Location = new System.Drawing.Point(136, 92);
-            this.textBoxCodingAAS.Name = "textBoxCodingAAS";
-            this.textBoxCodingAAS.Size = new System.Drawing.Size(264, 22);
-            this.textBoxCodingAAS.TabIndex = 40;
+            this.textBoxAASCoding.Location = new System.Drawing.Point(136, 92);
+            this.textBoxAASCoding.Name = "textBoxAASCoding";
+            this.textBoxAASCoding.Size = new System.Drawing.Size(264, 22);
+            this.textBoxAASCoding.TabIndex = 40;
             // 
             // buttonReadCodingAAS
             // 
@@ -1199,7 +1263,7 @@ namespace PSA_CVM2
             this.tabPage5.Location = new System.Drawing.Point(4, 25);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(534, 437);
+            this.tabPage5.Size = new System.Drawing.Size(534, 465);
             this.tabPage5.TabIndex = 5;
             this.tabPage5.Text = "ARTIV";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -1271,9 +1335,10 @@ namespace PSA_CVM2
             this.label34.AutoSize = true;
             this.label34.Location = new System.Drawing.Point(9, 284);
             this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(105, 80);
+            this.label34.Size = new System.Drawing.Size(136, 112);
             this.label34.TabIndex = 48;
-            this.label34.Text = "ARTIV_UDS\r\n2100-coś\r\n2101-kodowanie\r\n\r\nRADAR_AV_4";
+            this.label34.Text = "ARTIV_UDS\r\n2100-coding posibility\r\n2101-coding\r\n\r\nRADAR_AV_4\r\n2100-coding posibil" +
+    "ity\r\n2101-coding\r\n";
             // 
             // label13
             // 
@@ -1397,7 +1462,7 @@ namespace PSA_CVM2
             this.tabPage6.Location = new System.Drawing.Point(4, 25);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(534, 437);
+            this.tabPage6.Size = new System.Drawing.Size(534, 465);
             this.tabPage6.TabIndex = 6;
             this.tabPage6.Text = "COMBINE";
             this.tabPage6.UseVisualStyleBackColor = true;
@@ -1533,6 +1598,8 @@ namespace PSA_CVM2
             // 
             // tabPage7
             // 
+            this.tabPage7.Controls.Add(this.label62);
+            this.tabPage7.Controls.Add(this.panel2);
             this.tabPage7.Controls.Add(this.label46);
             this.tabPage7.Controls.Add(this.textBox4);
             this.tabPage7.Controls.Add(this.button2);
@@ -1551,10 +1618,58 @@ namespace PSA_CVM2
             this.tabPage7.Location = new System.Drawing.Point(4, 25);
             this.tabPage7.Name = "tabPage7";
             this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage7.Size = new System.Drawing.Size(534, 437);
+            this.tabPage7.Size = new System.Drawing.Size(534, 465);
             this.tabPage7.TabIndex = 7;
             this.tabPage7.Text = "TELEMAT";
             this.tabPage7.UseVisualStyleBackColor = true;
+            // 
+            // label62
+            // 
+            this.label62.AutoSize = true;
+            this.label62.Location = new System.Drawing.Point(7, 235);
+            this.label62.Name = "label62";
+            this.label62.Size = new System.Drawing.Size(76, 16);
+            this.label62.TabIndex = 62;
+            this.label62.Text = "Output tests";
+            // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.Color.Transparent;
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.button11);
+            this.panel2.Controls.Add(this.button10);
+            this.panel2.Controls.Add(this.button8);
+            this.panel2.Location = new System.Drawing.Point(3, 257);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(528, 202);
+            this.panel2.TabIndex = 61;
+            // 
+            // button11
+            // 
+            this.button11.Location = new System.Drawing.Point(4, 62);
+            this.button11.Name = "button11";
+            this.button11.Size = new System.Drawing.Size(287, 23);
+            this.button11.TabIndex = 2;
+            this.button11.Text = "180° Camera display control - Lateral view";
+            this.button11.UseVisualStyleBackColor = true;
+            // 
+            // button10
+            // 
+            this.button10.Location = new System.Drawing.Point(4, 33);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(287, 23);
+            this.button10.TabIndex = 1;
+            this.button10.Text = "180° Camera display control - Zoom view";
+            this.button10.UseVisualStyleBackColor = true;
+            // 
+            // button8
+            // 
+            this.button8.Location = new System.Drawing.Point(4, 4);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(287, 23);
+            this.button8.TabIndex = 0;
+            this.button8.Text = "180° Camera display control - Standard view";
+            this.button8.UseVisualStyleBackColor = true;
             // 
             // label46
             // 
@@ -1705,7 +1820,7 @@ namespace PSA_CVM2
             this.tabPage8.Location = new System.Drawing.Point(4, 25);
             this.tabPage8.Name = "tabPage8";
             this.tabPage8.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage8.Size = new System.Drawing.Size(534, 437);
+            this.tabPage8.Size = new System.Drawing.Size(534, 465);
             this.tabPage8.TabIndex = 8;
             this.tabPage8.Text = "INJ";
             this.tabPage8.UseVisualStyleBackColor = true;
@@ -1859,7 +1974,7 @@ namespace PSA_CVM2
             this.tabPage9.Location = new System.Drawing.Point(4, 25);
             this.tabPage9.Name = "tabPage9";
             this.tabPage9.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage9.Size = new System.Drawing.Size(534, 437);
+            this.tabPage9.Size = new System.Drawing.Size(534, 465);
             this.tabPage9.TabIndex = 9;
             this.tabPage9.Text = "BVA";
             this.tabPage9.UseVisualStyleBackColor = true;
@@ -2002,7 +2117,7 @@ namespace PSA_CVM2
             this.Controls.Add(this.textBoxInfo);
             this.Controls.Add(this.panel1);
             this.Name = "Form1";
-            this.Text = "PSA Arduino 12.03.2024";
+            this.Text = "PSA Arduino 25.08.2024";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.tabControl1.ResumeLayout(false);
@@ -2020,6 +2135,7 @@ namespace PSA_CVM2
             this.tabPage6.PerformLayout();
             this.tabPage7.ResumeLayout(false);
             this.tabPage7.PerformLayout();
+            this.panel2.ResumeLayout(false);
             this.tabPage8.ResumeLayout(false);
             this.tabPage8.PerformLayout();
             this.tabPage9.ResumeLayout(false);
@@ -2067,7 +2183,7 @@ namespace PSA_CVM2
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox textBoxSWCVM;
         private System.Windows.Forms.TextBox textBoxTypCVM;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBoxHWDAE;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label12;
@@ -2138,9 +2254,9 @@ namespace PSA_CVM2
         private System.Windows.Forms.TextBox textBoxZoneCVM;
         private System.Windows.Forms.TextBox textBoxZoneValueCVM;
         private System.Windows.Forms.Button buttonReadZoneCVM;
-        private System.Windows.Forms.TextBox textBox9;
+        private System.Windows.Forms.TextBox textBoxAASNewCoding;
         private System.Windows.Forms.Button buttonWriteCodingAAS;
-        private System.Windows.Forms.TextBox textBoxCodingAAS;
+        private System.Windows.Forms.TextBox textBoxAASCoding;
         private System.Windows.Forms.Button buttonReadCodingAAS;
         private System.Windows.Forms.Label label37;
         private System.Windows.Forms.Label label38;
@@ -2192,9 +2308,9 @@ namespace PSA_CVM2
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.Label label52;
         private System.Windows.Forms.Label label53;
-        private System.Windows.Forms.TextBox textBox12;
-        private System.Windows.Forms.TextBox textBox13;
-        private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.TextBox textBoxZoneDAE;
+        private System.Windows.Forms.TextBox textBoxZoneValueDAE;
+        private System.Windows.Forms.Button buttonReadZoneDAE;
         private System.Windows.Forms.Button buttonWriteZoneBSI;
         private System.Windows.Forms.TabPage tabPage9;
         private System.Windows.Forms.Label label54;
@@ -2212,6 +2328,16 @@ namespace PSA_CVM2
         private System.Windows.Forms.TextBox textBoxSWBVA;
         private System.Windows.Forms.TextBox textBoxTypBVA;
         private System.Windows.Forms.Button buttonIdentifyBVA;
+        private System.Windows.Forms.Label label60;
+        private System.Windows.Forms.TextBox textBoxmileage;
+        private System.Windows.Forms.Label label61;
+        private System.Windows.Forms.Button buttonClearFaults;
+        private System.Windows.Forms.Button buttonReadFaults;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label label62;
+        private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Button button11;
+        private System.Windows.Forms.Button button10;
     }
 }
 

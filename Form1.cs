@@ -25,6 +25,7 @@ namespace PSA_CVM2
     public partial class Form1 : Form
     {
         public string serialData;
+        public string mileage;
         public string BSI = ">752:652";
         public string CodingKeyBSI;
         public string CVM = ">74A:64A";
@@ -57,6 +58,7 @@ namespace PSA_CVM2
                 comboBoxCOM.Items.Add(x);
             int val = comboBoxCOM.Items.Count;
             richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " Found " + val.ToString() + " device(s)" + Environment.NewLine;
+            richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
             if (val > 0)
             {
                 comboBoxCOM.SelectedIndex = 0;
@@ -72,6 +74,7 @@ namespace PSA_CVM2
             {
                 textBoxInfo.Text = "COM port not selected";
                 richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " COM port not selected" + Environment.NewLine;
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
             }
             else if (comboBoxCOM.Text != string.Empty)
             {
@@ -86,6 +89,7 @@ namespace PSA_CVM2
                     {
                         textBoxInfo.Text = "COM port is not accesible";
                         richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " COM port is not accesible" + Environment.NewLine;
+                        richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                         return;
                     }
                 }
@@ -95,6 +99,7 @@ namespace PSA_CVM2
                 buttonIdentifyVIN.Enabled = true;
                 textBoxInfo.Text = "Connected to Interface";
                 richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " Connected to Interface" + Environment.NewLine;
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
             }
         }
         private void ButtonStop_Click(object sender, EventArgs e)
@@ -121,6 +126,7 @@ namespace PSA_CVM2
             textBoxVin.Clear();
             textBoxInfo.Text = "Disconnected";
             richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " Disconnected" + Environment.NewLine;
+            richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
         }
         public async void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
@@ -139,18 +145,19 @@ namespace PSA_CVM2
             {
                 richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + String.Format(odpowiedz) + Environment.NewLine;
                 Vinbsi();
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
             }
             else
             {
                 richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " Not connected to car" + Environment.NewLine;
                 textBoxInfo.Text = "Not connected to car";
                 MessageBox.Show("Not connected to car");
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
             }
         }
         public void Vinbsi()
         {
-            string zone = "F190";
-            string odebraneVIN = ReadZoneUDS(zone);
+            string odebraneVIN = ReadZoneUDS("F190");
             string toRemove = "62F190";                                                                  // procedura usuwania polecania CAN z ciagu danych do wyświetlenia VIN
             string result = string.Empty;
             int s = odebraneVIN.IndexOf(toRemove);
@@ -176,12 +183,15 @@ namespace PSA_CVM2
                     char charValue = (char)value;
                     string VIN1 = charValue.ToString();
                     textBoxVin.AppendText(VIN1);
-                    UnlockIdentification();
+                    
                 if (textBoxVin.TextLength == 17)
-                {
+                { 
+                    string mileage = ReadZoneUDS("DBA2").Substring(6,8);
+                    textBoxmileage.Text = Convert.ToInt32(mileage, 16) / 10 + " km";
+                    UnlockIdentification();
                     if (!Directory.Exists(@"Logs"))
                     { Directory.CreateDirectory("Logs"); }
-                    string path = @"Logs\Log-" + textBoxVin.Text + ".txt";
+                    string path = @"Logs\Log-" + textBoxVin.Text + "-" + textBoxmileage.Text + ".txt";
                     if (!File.Exists(path))
                     {
                         using (StreamWriter sw = File.CreateText(path))
@@ -204,6 +214,8 @@ namespace PSA_CVM2
             buttonIdentifyTELEMAT.Enabled = false;
             buttonIdentifyINJ.Enabled = false;
             buttonIdentifyBVA.Enabled = false;
+            buttonReadFaults.Enabled = false;
+            buttonClearFaults.Enabled = false;
         }
         private void UnlockIdentification()
         {
@@ -217,16 +229,20 @@ namespace PSA_CVM2
             buttonIdentifyTELEMAT.Enabled = true;
             buttonIdentifyINJ.Enabled = true;
             buttonIdentifyBVA.Enabled = true;
+            buttonReadFaults.Enabled = true;
+            buttonClearFaults.Enabled = true;
         }
         private void UnlockCodingBSI()
         {
             buttonReadZoneBSI.Enabled = true;
             buttonStartCodingBSI.Enabled = true;
+            buttonWriteZoneBSI.Enabled = true;
         }
         private void LockCodingBSI()
         {
             buttonReadZoneBSI.Enabled = false;
             buttonStartCodingBSI.Enabled = false;
+            buttonWriteZoneBSI.Enabled = false;
         }
         private void UnlockCodingCVM()
         {
@@ -244,11 +260,13 @@ namespace PSA_CVM2
         {
             buttonReadCodingDAE.Enabled = true;
             buttonWriteCodingDAE.Enabled = true;
+            buttonReadZoneDAE.Enabled = true;
         }
         private void LockCodingDAE()
         {
             buttonReadCodingDAE.Enabled = false;
             buttonWriteCodingDAE.Enabled = false;
+            buttonReadZoneDAE.Enabled = false;
         }
         private void UnlockCodingAAS()
         {
@@ -341,22 +359,26 @@ namespace PSA_CVM2
         {
             spArduino.WriteLine("22" + zone);
             richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > 22" + zone + Environment.NewLine;
-            Thread.Sleep(1500);
+            Thread.Sleep(500);
             string odpowiedz = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odpowiedz + Environment.NewLine;
             return odpowiedz;
         }
-        private void WriteZoneUDS(string zone,string value)
+        private string WriteZoneUDS(string zone,string value)
         {
             spArduino.WriteLine("2E" + zone + value);
             richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > 2E" + zone + value + Environment.NewLine;
             Thread.Sleep(500);
+            string odpowiedz = serialData;
+            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odpowiedz + Environment.NewLine;
+            return odpowiedz;
+
         }
         private string ReadZoneKWP(string zone)
         {
             spArduino.WriteLine("21" + zone);
             richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > 21" + zone + Environment.NewLine;
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             string odpowiedz = serialData;
             richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odpowiedz + Environment.NewLine;
             return odpowiedz;
@@ -396,6 +418,7 @@ namespace PSA_CVM2
                     richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                     richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
                     richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefBSIZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefBSIZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefBSIZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                     CodingKeyBSI = "B4E0";
                     UnlockCodingBSI();
                 }
@@ -410,6 +433,7 @@ namespace PSA_CVM2
                     richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                     richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
                     richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefBSIZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefBSIZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefBSIZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                     UnlockCodingBSI();
                 }
             else if (typbsi == "0DB3")
@@ -423,6 +447,7 @@ namespace PSA_CVM2
                     richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                     richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
                     richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefBSIZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefBSIZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefBSIZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                     UnlockCodingBSI();
                 }
             else
@@ -436,6 +461,7 @@ namespace PSA_CVM2
                     richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                     richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWBSI.Text) + Environment.NewLine;
                     richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefBSIZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefBSIZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefBSIZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                     UnlockCodingBSI();
                 }
         }
@@ -455,8 +481,7 @@ namespace PSA_CVM2
                     result2 = odebrane3.Remove(s, toRemove.Length);
                 }
                 textBoxZoneValueBSI.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
-                //spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
-                //Thread.Sleep(100);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 if (textBoxZoneValueBSI.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
                 {
                     textBoxInfo.Text = "No coding in this zone";
@@ -469,34 +494,24 @@ namespace PSA_CVM2
         }
         public void ButtonStartCodingBSI_Click(object sender, EventArgs e)
         {
-            /*if (textBoxZoneNewValueBSI.Text == "")
-                {
-                textBoxInfo.Text = "New coding not written";
-                }    
-            else if (textBoxZoneValueBSI.Text == textBoxZoneNewValueBSI.Text)
-                {
-                textBoxInfo.Text = "Coding wasn't changed";
-                }
-            else if (textBoxZoneValueBSI.Text != textBoxZoneNewValueBSI.Text)
-            {
-                spArduino.WriteLine(String.Format(":" + CodingKeyBSI + ":03:03"));
-                richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " :" + CodingKeyBSI + ":03:03" + Environment.NewLine;
-                Thread.Sleep(500); 
-                string odebrane2 = serialData;
-                richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane2 + Environment.NewLine;
-                Thread.Sleep(500);
-                string odebrane3 = serialData;
-                richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane3 + Environment.NewLine;
-                WriteZoneUDS(textBoxZoneBSI.Text, textBoxZoneNewValueBSI.Text);
-                //spArduino.WriteLine(String.Format("2E" + textBoxZoneBSI.Text + textBoxZoneNewValueBSI.Text));
-                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > 2E" + textBoxZoneBSI.Text + textBoxZoneNewValueBSI.Text + Environment.NewLine;
-                Thread.Sleep(100);
-                string odebrane4 = serialData;
-                richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane4 + Environment.NewLine;
-            }*/
             spArduino.WriteLine(String.Format(":" + String.Format(CodingKeyBSI) + ":03:03"));
             Thread.Sleep(100);
             richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" > :" + String.Format(CodingKeyBSI) + ":03:03");
+        }
+        private void ButtonWriteZoneBSI_Click(object sender, EventArgs e)
+        {
+            if (textBoxZoneNewValueBSI.Text == "")
+            {
+                textBoxInfo.Text = "New coding not written";
+            }
+            else if (textBoxZoneValueBSI.Text == textBoxZoneNewValueBSI.Text)
+            {
+                textBoxInfo.Text = "Coding wasn't changed";
+            }
+            else if (textBoxZoneValueBSI.Text != textBoxZoneNewValueBSI.Text)
+            {
+                WriteZoneUDS(textBoxZoneBSI.Text, textBoxZoneNewValueBSI.Text);
+            }
         }
         public void ButtonIdentifyCVM_Click(object sender, EventArgs e)
         {
@@ -507,6 +522,7 @@ namespace PSA_CVM2
                 string message = "Module not installed in car";
                 textBoxInfo.Text = message;
                 richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " " + String.Format(message) + Environment.NewLine;
+                buttonIdentifyCVM.Enabled = false;
                 MessageBox.Show(message);
             }
             else
@@ -543,7 +559,8 @@ namespace PSA_CVM2
                     richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                     richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
                     richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefCVMZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefCVMZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefCVMZI[0].Substring(4, 2), 16);
-                    string CodingKeyCVM = "E2E5";
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                    CodingKeyCVM = "E2E5";
                     UnlockCodingCVM();
                 }
                 else if (typcvm == "179")
@@ -557,6 +574,7 @@ namespace PSA_CVM2
                     richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                     richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
                     richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefCVMZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefCVMZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefCVMZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                     UnlockCodingCVM();
                 }
                 else
@@ -570,6 +588,7 @@ namespace PSA_CVM2
                     richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                     richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
                     richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefCVMZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefCVMZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefCVMZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                     UnlockCodingCVM();
                 }
             }
@@ -583,6 +602,7 @@ namespace PSA_CVM2
                 int s2 = odebraneCodingCVM.IndexOf(toRemove3);
                 string resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
                 textBoxCVMCoding.Text = resultCodingCVM;
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
             }
             else if (textBoxTypCVM.Text == "CVM_3")
             {
@@ -591,6 +611,7 @@ namespace PSA_CVM2
                 int s2 = odebraneCodingCVM.IndexOf(toRemove3);
                 string resultCodingCVM = odebraneCodingCVM.Remove(s2, toRemove3.Length);
                 textBoxCVMCoding.Text = resultCodingCVM;
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
             }
             spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
             Thread.Sleep(100);
@@ -609,37 +630,18 @@ namespace PSA_CVM2
             {
                 if (textBoxTypCVM.Text == "CVM_2")
                 {
-                    string zone = "2100";
+                    zone = "2100";
                 }
                 else if (textBoxTypCVM.Text == "CVM_3")
                 {
-                    string zone = "2101";
+                    zone = "2101";
                 }
-                spArduino.WriteLine(String.Format("1003"));
+                spArduino.WriteLine(":" + CodingKeyCVM + ":03:03");
                 Thread.Sleep(100);
                 string odebrane = serialData;
                 richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane + Environment.NewLine;
-                spArduino.WriteLine(String.Format("2703"));  //  wysyłamy polecenie CAN by otwrzymać SEED do odblokowania kodowania
-                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > 2703" + Environment.NewLine;
-                Thread.Sleep(500);
-                string odebrane1 = serialData;
-                richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane1 + Environment.NewLine;
-                if (odebrane1.Substring(0, 4) == "6703")
+                if (odebrane.Substring(0, 4) == "6704")
                 {
-                    string Seed = odebrane1.Substring(4, 8);
-                    richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " Seed: " + Seed + Environment.NewLine;
-                    richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " Key: " + CodingKeyCVM + Environment.NewLine;
-                    // wygenerowc seedkey
-                    string SeedKey = GetKey(Seed, CodingKeyCVM);
-                    richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " Seedkey: " + SeedKey + Environment.NewLine;
-                    // wyslac 2704xxxxxxxx
-                    spArduino.WriteLine(String.Format("2704" + SeedKey));
-                    richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > 2704" + SeedKey + Environment.NewLine;
-                    Thread.Sleep(100);
-                    string odebrane2 = serialData;
-                    richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane2 + Environment.NewLine;
-                    if (odebrane2.Substring(0, 4) == "6704")// jesli odpowiedz 6704 to ok
-                    {// wyslac 2E"zone"+"new value"
                         string command = "2E" + String.Format(zone) + textBoxCVMNewCoding.Text;
                         spArduino.WriteLine(String.Format(command));
                         richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > " + String.Format(command) + Environment.NewLine;
@@ -652,11 +654,6 @@ namespace PSA_CVM2
                         Thread.Sleep(100);
                         string odebrane4 = serialData;
                         richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane4 + Environment.NewLine;
-                    }
-                    else
-                    {
-                        textBoxInfo.Text = "Seedkey not correct";
-                    }
                 }
                 else
                 {
@@ -680,8 +677,7 @@ namespace PSA_CVM2
                     result2 = odebrane3.Remove(s, toRemove.Length);
                 }
                 textBoxZoneValueCVM.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
-                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
-                Thread.Sleep(100);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 if (textBoxZoneValueCVM.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
                 {
                     textBoxInfo.Text = "No coding in this zone";
@@ -700,17 +696,22 @@ namespace PSA_CVM2
             {
                 string odebraneDAEZA = ReadZoneKWP("80");
                 string odebraneDAEZI = ReadZoneKWP("FE");
-                string Ref = odebraneDAEZI.Substring(46, 6);
-                textBoxSWDAE.Text = "96" + Ref + "80";
+                string[] RefDAEZA = { odebraneDAEZA.Substring(4, 10), odebraneDAEZA.Substring(16, 2), odebraneDAEZA.Substring(18, 10), odebraneDAEZA.Substring(28, 4) };
+                string[] RefDAEZI = { odebraneDAEZI.Substring(16, 6), odebraneDAEZI.Substring(24, 2), odebraneDAEZI.Substring(26, 4), odebraneDAEZI.Substring(30, 6), odebraneDAEZI.Substring(44, 2), odebraneDAEZI.Substring(46, 6) };
+                textBoxSWDAE.Text = "96" + RefDAEZI[5] + "80";
                 textBoxTypDAE.Text = "DAE_BVH2";
                 richTextBoxLog.Text += Environment.NewLine + "DAE: " + string.Format(textBoxTypDAE.Text) + Environment.NewLine;
-                //richTextBoxLog.Text += "Calibration Version: " + RefCVMZI[0] + Environment.NewLine;
+                richTextBoxLog.Text += "Software Version: " + RefDAEZA[3].Substring(0, 2) + "." + RefDAEZA[3].Substring(2, 2) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefDAEZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWDAE.Text) + Environment.NewLine;
-                //richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefCVMZI[1]) + "." + string.Format(RefCVMZI[2]) + Environment.NewLine;
-                //richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefCVMZI[4]) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefDAEZI[2].Substring(0, 2)) + "." + string.Format(RefDAEZI[2].Substring(2, 2)) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefDAEZI[4]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + Convert.ToInt32(RefDAEZI[3].Substring(0, 2), 16) + "." + Convert.ToInt32(RefDAEZI[3].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefDAEZI[3].Substring(4, 2), 16) + Environment.NewLine;
                 //richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefDAEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefDAEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefDAEZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                CodingKeyDAE = "2305";
                 UnlockCodingDAE();
-                string CodingKeyDAE = "2305";
             }
             else
             {
@@ -718,16 +719,126 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + String.Format(odpowiedz) + Environment.NewLine;
                 string odebraneDAEZA = ReadZoneUDS("F080");
                 string odebraneDAEZI = ReadZoneUDS("F0FE");
+                string[] RefDAEZI = { odebraneDAEZI.Substring(18, 6), odebraneDAEZI.Substring(26, 2), odebraneDAEZI.Substring(28, 2), odebraneDAEZI.Substring(30, 2), odebraneDAEZI.Substring(32, 6), odebraneDAEZI.Substring(46, 2), odebraneDAEZI.Substring(48, 6) };
+                textBoxSWDAE.Text = "96" + RefDAEZI[6] + "80";
+                textBoxHWDAE.Text = odebraneDAEZA.Substring(20, 10);
+                int TD = Convert.ToInt32(RefDAEZI[4].Substring(0, 2), 16);
+                int TM = Convert.ToInt32(RefDAEZI[4].Substring(2, 2), 16);
+                int TY = Convert.ToInt32(RefDAEZI[4].Substring(4, 2), 16);
+                string TDstring = TD.ToString();
+                string TMstring = TM.ToString();
+                string TYstring = "20" + TY.ToString();
+                if (RefDAEZI[4].Substring(0, 2) == "FF")
+                {
+                    TDstring = RefDAEZI[4].Substring(0, 2);
+                    TMstring = RefDAEZI[4].Substring(2, 2);
+                    TYstring = RefDAEZI[4].Substring(4, 2);
+                }
+                string typdae = odebraneDAEZI.Substring(14, 4);// wydobycie z ciągu sekcji 4 bajtów typu modułu z odebranych danych
+                textBoxTypDAE.Text = typdae;
+                if (typdae == "796C")
+                {
+                    textBoxTypDAE.Text = "DAE_UDS";
+                    richTextBoxLog.Text += Environment.NewLine + "DAE: " + string.Format(textBoxTypDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefDAEZI[1] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefDAEZI[2]) + "." + string.Format(RefDAEZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefDAEZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefDAEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefDAEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefDAEZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                    UnlockCodingDAE();
+                }
+                else if (typdae == "136A")
+                {
+                    textBoxTypDAE.Text = "?";
+                    richTextBoxLog.Text += Environment.NewLine + "DAE: " + string.Format(textBoxTypDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefDAEZI[1] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefDAEZI[2]) + "." + string.Format(RefDAEZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefDAEZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefDAEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefDAEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefDAEZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                    UnlockCodingDAE();
+                }
+                else if (typdae == "215B")
+                {
+                    textBoxTypDAE.Text = "GEP_UDS";
+                    richTextBoxLog.Text += Environment.NewLine + "DAE: " + string.Format(textBoxTypDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefDAEZI[1] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefDAEZI[2]) + "." + string.Format(RefDAEZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefDAEZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefDAEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefDAEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefDAEZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                    UnlockCodingDAE();
+                }
+                else
+                {
+                    textBoxTypDAE.Text = "Unknown " + typdae;
+                    richTextBoxLog.Text += Environment.NewLine + "DAE: " + string.Format(textBoxTypDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefDAEZI[1] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefDAEZI[2]) + "." + string.Format(RefDAEZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefDAEZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefDAEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefDAEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefDAEZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                    UnlockCodingDAE();
+                }
+
             }
         }
         public void ButtonReadCodingDAE_Click(object sender, EventArgs e)
         {
-            ConnectModuleKWP(DAE);
-            string odebrane = ReadZoneKWP("A0");
-            string toRemove4 = String.Format("61A0");
-            int s2 = odebrane.IndexOf(toRemove4);                                          // Zapis string.Empty lub string = ""; to to samo
-            string CodingDAE = odebrane.Remove(s2, toRemove4.Length);
-            textBoxDAECoding.Text = CodingDAE;
+            if (textBoxTypDAE.Text == "DAE_BVH2")
+            {
+                string odebrane = ReadZoneKWP("A0");
+                string toRemove4 = String.Format("61A0");
+                int s2 = odebrane.IndexOf(toRemove4);                                          // Zapis string.Empty lub string = ""; to to samo
+                string CodingDAE = odebrane.Remove(s2, toRemove4.Length);
+                textBoxDAECoding.Text = CodingDAE;
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+            }
+            else
+            {
+                textBoxInfo.Text = "Select zone";
+                richTextBoxLog.Text += Environment.NewLine + "Select zone" + Environment.NewLine;
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+            }
+        }
+        private void ButtonReadZoneDAE_Click(object sender, EventArgs e)
+        {
+            if (textBoxZoneDAE.Text != "")
+            {
+                spArduino.WriteLine(String.Format("1003"));                                    // Otwarcie sesji diagnostycznej
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" > 1003");
+                Thread.Sleep(100);
+                string odebrane3 = ReadZoneUDS(textBoxZoneDAE.Text);
+                string toRemove = "62" + textBoxZoneDAE.Text;
+                string result2 = string.Empty;                                               // obcięcie polecenia CN do wyświetlenia w textbox - to juz znamy z opisu VIN
+                int s = odebrane3.IndexOf(toRemove);                                          // Zapis string.Empty lub string = ""; to to samo
+                if (s >= 0)
+                {
+                    result2 = odebrane3.Remove(s, toRemove.Length);
+                }
+                textBoxZoneValueDAE.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                if (textBoxZoneValueDAE.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
+                {
+                    textBoxInfo.Text = "No coding in this zone";
+                }
+            }
+            else
+            {
+                textBoxInfo.Text = "Please select zone";
+            }
         }
         public void ButtonWriteCodingDAE_Click(object sender, EventArgs e)
         {
@@ -780,6 +891,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefAASZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefAASZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefAASZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 //                string CodingKeyAAS = "0000";
                 UnlockCodingAAS();
             }
@@ -794,7 +906,8 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefAASZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefAASZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefAASZI[0].Substring(4, 2), 16);
-                string CodingKeyAAS = "D1F5";
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                CodingKeyAAS = "D1F5";
                 UnlockCodingAAS();
             }
             else if (typAAS == "4599")
@@ -808,6 +921,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefAASZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefAASZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefAASZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 //               string CodingKeyAAS = "xxxx";
                 UnlockCodingAAS();
             }
@@ -822,6 +936,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefAASZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefAASZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefAASZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 //               string CodingKeyAAS = "B6F0";
                 UnlockCodingAAS();
             }
@@ -836,34 +951,80 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWAAS.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefAASZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefAASZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefAASZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 UnlockCodingAAS();
             }
         }
         private void ButtonReadCodingAAS_Click(object sender, EventArgs e)
         {
-            /*if (textBoxTypAAS.Text == "AAS_UDS_G5")
+            if (textBoxTypAAS.Text == "AAS_UDS_G5")
             {
                 string odebraneCodingAAS = ReadZoneUDS("2100");
                 string toRemove3 = String.Format("622100");
                 int s2 = odebraneCodingAAS.IndexOf(toRemove3);
-                string resultCodingAAS = odebraneCodingAAS.Remove(s2, toRemove3.Length);
-                textBoxCodingAAS.Text = resultCodingAAS;
-            }*/
-            if (textBoxTypAAS.Text == "CPK_UDS_G5")
+                string resultAASCoding = odebraneCodingAAS.Remove(s2, toRemove3.Length);
+                textBoxAASCoding.Text = resultAASCoding;
+            }
+            else if (textBoxTypAAS.Text == "CPK_UDS_G5")
             {
                 string odebraneCodingAAS = ReadZoneUDS("2101");
                 string toRemove3 = String.Format("622101");
                 int s2 = odebraneCodingAAS.IndexOf(toRemove3);
-                string resultCodingAAS = odebraneCodingAAS.Remove(s2, toRemove3.Length);
-                textBoxCodingAAS.Text = resultCodingAAS;
+                string resultAASCoding = odebraneCodingAAS.Remove(s2, toRemove3.Length);
+                textBoxAASCoding.Text = resultAASCoding;
             }
             else if (textBoxTypAAS.Text == "AAS_UDS_G6")
             {
                 string odebraneCodingAAS = ReadZoneUDS("2101");
                 string toRemove3 = String.Format("622101");
                 int s2 = odebraneCodingAAS.IndexOf(toRemove3);
-                string resultCodingAAS = odebraneCodingAAS.Remove(s2, toRemove3.Length);
-                textBoxCodingAAS.Text = resultCodingAAS;
+                string resultAASCoding = odebraneCodingAAS.Remove(s2, toRemove3.Length);
+                textBoxAASCoding.Text = resultAASCoding;
+            }
+        }
+        private void ButtonWriteCodingAAS_Click(object sender, EventArgs e)
+        {
+            if (textBoxAASNewCoding.Text == "")
+            {
+                textBoxInfo.Text = "New coding not written";
+            }
+            else if (textBoxAASCoding.Text == textBoxAASNewCoding.Text)
+            {
+                textBoxInfo.Text = "Coding wasn't changed";
+            }
+            else if (textBoxAASCoding.Text != textBoxAASNewCoding.Text)
+            {
+                if (textBoxTypAAS.Text == "AAS_UDS_G5")
+                {
+                    zone = "2100";
+                }
+                else if (textBoxTypAAS.Text == "CPK_UDS_G5")
+                {
+                    zone = "2101";
+                }
+                spArduino.WriteLine(":" + CodingKeyAAS + ":03:03");
+                Thread.Sleep(100);
+                string odebrane = serialData;
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane + Environment.NewLine;
+                if (odebrane.Substring(0, 4) == "6704")
+                {
+                    string command = "2E" + zone + textBoxAASNewCoding.Text;
+                    spArduino.WriteLine(String.Format(command));
+                    richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > " + String.Format(command) + Environment.NewLine;
+                    Thread.Sleep(100);
+                    string odebrane3 = serialData;
+                    richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane3 + Environment.NewLine;
+                    //wyslac ramke 2E2901FD000000010101 aby nie bylo bledu B1003 zabezpieczonego kodowania
+                    spArduino.WriteLine("2E2901FD000000010101");
+                    richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > 2E290100000000010101" + Environment.NewLine;
+                    Thread.Sleep(100);
+                    string odebrane4 = serialData;
+                    richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane4 + Environment.NewLine;
+                }
+                else
+                {
+                    textBoxInfo.Text = "Coding conditions not met";
+                }
             }
         }
         private void ButtonReadZoneAAS_Click(object sender, EventArgs e)
@@ -882,8 +1043,7 @@ namespace PSA_CVM2
                     result2 = odebrane3.Remove(s, toRemove.Length);
                 }
                 textBoxZoneValueAAS.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
-                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
-                Thread.Sleep(100);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 if (textBoxZoneValueAAS.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
                 {
                     textBoxInfo.Text = "No coding in this zone";
@@ -903,6 +1063,7 @@ namespace PSA_CVM2
                 string message = "Module not installed in car";
                 textBoxInfo.Text = message;
                 richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " " + String.Format(message) + Environment.NewLine;
+                buttonIdentifyARTIV.Enabled = false;
                 MessageBox.Show(message);
             }
             else
@@ -937,6 +1098,7 @@ namespace PSA_CVM2
                     richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                     richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
                     richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefARTIVZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefARTIVZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefARTIVZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                     //string CodingKeyARTIV = "xxxx";
                     UnlockCodingARTIV();
                 }
@@ -951,6 +1113,7 @@ namespace PSA_CVM2
                     richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                     richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
                     richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefARTIVZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefARTIVZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefARTIVZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                     UnlockCodingARTIV();
                 }
                 else
@@ -964,6 +1127,7 @@ namespace PSA_CVM2
                     richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                     richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWARTIV.Text) + Environment.NewLine;
                     richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefARTIVZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefARTIVZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefARTIVZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                     UnlockCodingARTIV();
                 }
             }
@@ -978,14 +1142,14 @@ namespace PSA_CVM2
                 string resultCodingARTIV = odebraneCodingARTIV.Remove(s2, toRemove3.Length);
                 textBoxCodingARTIV.Text = resultCodingARTIV;
             }
- /*           else if (textBoxTypARTIV.Text == "RADAR_AV_4")
+            else if (textBoxTypARTIV.Text == "RADAR_AV_4")
             {
                 string odebraneCodingARTIV = ReadZoneUDS("2101");
                 string toRemove3 = String.Format("622101");
                 int s2 = odebraneCodingARTIV.IndexOf(toRemove3);
                 string resultCodingARTIV = odebraneCodingARTIV.Remove(s2, toRemove3.Length);
                 textBoxCodingARTIV.Text = resultCodingARTIV;
-            }*/
+            }
             }
         private void ButtonReadZoneARTIV_Click(object sender, EventArgs e)
         {
@@ -1003,8 +1167,7 @@ namespace PSA_CVM2
                     result2 = odebrane3.Remove(s, toRemove.Length);
                 }
                 textBoxZoneValueARTIV.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
-                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
-                Thread.Sleep(100);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 if (textBoxZoneValueARTIV.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
                 {
                     textBoxInfo.Text = "No coding in this zone";
@@ -1049,6 +1212,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefCOMBINEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefCOMBINEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefCOMBINEZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 CodingKeyCOMBINE = "FAFA";
                 UnlockCodingCOMBINE();
             }
@@ -1063,6 +1227,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefCOMBINEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefCOMBINEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefCOMBINEZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 UnlockCodingCOMBINE();
             }
             else
@@ -1076,6 +1241,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWCOMBINE.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefCOMBINEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefCOMBINEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefCOMBINEZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 UnlockCodingCOMBINE();
             }
         }
@@ -1095,8 +1261,7 @@ namespace PSA_CVM2
                     result2 = odebrane3.Remove(s, toRemove.Length);
                 }
                 textBoxZoneValueCOMBINE.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
-                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
-                Thread.Sleep(100);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 if (textBoxZoneValueCOMBINE.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
                 {
                     textBoxInfo.Text = "No coding in this zone";
@@ -1141,6 +1306,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefTELEMATZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefTELEMATZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefTELEMATZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 CodingKeyTELEMAT = "D91C";
                 UnlockCodingTELEMAT();
             }
@@ -1155,6 +1321,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefTELEMATZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefTELEMATZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefTELEMATZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 CodingKeyTELEMAT = "F107";
                 UnlockCodingTELEMAT();
             }
@@ -1169,6 +1336,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefTELEMATZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefTELEMATZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefTELEMATZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 UnlockCodingTELEMAT();
             }
         }
@@ -1188,8 +1356,7 @@ namespace PSA_CVM2
                     result2 = odebrane3.Remove(s, toRemove.Length);
                 }
                 textBoxZoneValueTELEMAT.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
-                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
-                Thread.Sleep(100);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 if (textBoxZoneValueTELEMAT.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
                 {
                     textBoxInfo.Text = "No coding in this zone";
@@ -1223,7 +1390,22 @@ namespace PSA_CVM2
             }
             string typINJ = odebraneINJZI.Substring(14, 4);                                          // wydobycie z ciągu sekcji 4 bajtów typu BSI z odebranych danych
             textBoxTypINJ.Text = typINJ;
-            if (typINJ == "0326")
+            if (typINJ == "0322")
+            {
+                textBoxTypINJ.Text = "CMM_MED1744AA";
+                richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[1] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[2]) + "." + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                //                string CodingKeyINJ = "0000";
+                UnlockCodingINJ();
+            }
+            else if (typINJ == "0326")
             {
                 textBoxTypINJ.Text = "CMM_MG1CS042";
                 richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
@@ -1234,6 +1416,22 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                //                string CodingKeyINJ = "0000";
+                UnlockCodingINJ();
+            }
+            else if (typINJ == "060F")
+            {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
+                textBoxTypINJ.Text = "CMM_VD46";
+                richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[1] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[2]) + "." + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
@@ -1248,6 +1446,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
@@ -1262,6 +1461,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
@@ -1276,6 +1476,22 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                //                string CodingKeyINJ = "0000";
+                UnlockCodingINJ();
+            }
+            else if (typINJ == "1310")
+            {
+                textBoxTypINJ.Text = "CMM_DCM62";
+                richTextBoxLog.Text += Environment.NewLine + "INJ: " + string.Format(textBoxTypINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Version: " + RefINJZI[1] + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefINJZI[2]) + "." + string.Format(RefINJZI[3]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefINJZI[5]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
@@ -1290,6 +1506,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 //                string CodingKeyINJ = "0000";
                 UnlockCodingINJ();
             }
@@ -1304,6 +1521,7 @@ namespace PSA_CVM2
                 richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                 richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWINJ.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefINJZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefINJZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefINJZI[0].Substring(4, 2), 16);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 UnlockCodingINJ();
             }
         }
@@ -1323,8 +1541,7 @@ namespace PSA_CVM2
                     result2 = odebrane3.Remove(s, toRemove.Length);
                 }
                 textBoxZoneValueINJ.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
-                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
-                Thread.Sleep(100);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 if (textBoxZoneValueINJ.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
                 {
                     textBoxInfo.Text = "No coding in this zone";
@@ -1344,6 +1561,7 @@ namespace PSA_CVM2
                 string message = "Module not installed in car";
                 textBoxInfo.Text = message;
                 richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " " + String.Format(message) + Environment.NewLine;
+                buttonIdentifyBVA.Enabled = false;
                 MessageBox.Show(message);
             }
             else
@@ -1378,6 +1596,21 @@ namespace PSA_CVM2
                     richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                     richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWBVA.Text) + Environment.NewLine;
                     richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefBVAZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefBVAZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefBVAZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                    UnlockCodingBVA();
+                }
+                else if (typbva == "3070")
+                {
+                    textBoxTypBVA.Text = "BVA AXTN8";
+                    richTextBoxLog.Text += Environment.NewLine + "BVA: " + string.Format(textBoxTypBVA.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefBVAZI[1] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWBVA.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefBVAZI[2]) + "." + string.Format(RefBVAZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefBVAZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWBVA.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefBVAZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefBVAZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefBVAZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                     UnlockCodingBVA();
                 }
                 else
@@ -1391,6 +1624,7 @@ namespace PSA_CVM2
                     richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
                     richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWBVA.Text) + Environment.NewLine;
                     richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefBVAZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefBVAZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefBVAZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                     UnlockCodingBVA();
                 }
             }
@@ -1411,8 +1645,7 @@ namespace PSA_CVM2
                     result2 = odebrane3.Remove(s, toRemove.Length);
                 }
                 textBoxZoneValueBVA.Text = result2;                                                     // wyświetlenie wartości kodowania w textbox
-                spArduino.WriteLine(String.Format("1001"));                                        // reset komunikacji
-                Thread.Sleep(100);
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                 if (textBoxZoneValueBVA.Text == "")                                                     // sposób wyświetlnia w polu INFO warunki wystapienia zdarzeń
                 {
                     textBoxInfo.Text = "No coding in this zone";
@@ -1550,20 +1783,41 @@ namespace PSA_CVM2
         }
         public void ButtonAlgo_Click(object sender, EventArgs e)
         {
+            string mileage = "000EFDA2";
+            richTextBoxLog.Text += "Input value mileage: " + string.Format(mileage) + Environment.NewLine;
+            richTextBoxLog.Text += "Mileage: " + Convert.ToInt32(mileage, 16)/10 + " km" + Environment.NewLine;
+            textBoxmileage.Text = Convert.ToInt32(mileage, 16) / 10 + " km";
+            richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+
+            /*string odebraneDAEZA = "6180982707648000219829982180D020FFFF0101FFFFFFFF";
+            string odebraneDAEZI = "61FE00000000215C1D06100510FF01000000FE02000001933887";
+            string[] RefDAEZA = { odebraneDAEZA.Substring(4, 10), odebraneDAEZA.Substring(16, 2), odebraneDAEZA.Substring(18, 10), odebraneDAEZA.Substring(28, 4) };
+            string[] RefDAEZI = { odebraneDAEZI.Substring(16, 6), odebraneDAEZI.Substring(24, 2), odebraneDAEZI.Substring(26, 4), odebraneDAEZI.Substring(30, 6), odebraneDAEZI.Substring(44, 2), odebraneDAEZI.Substring(46, 6) };
+            textBoxSWDAE.Text = "96" + RefDAEZI[5] + "80";
+            textBoxTypDAE.Text = "DAE_BVH2";
+            richTextBoxLog.Text += Environment.NewLine + "DAE: " + string.Format(textBoxTypDAE.Text) + Environment.NewLine;
+            richTextBoxLog.Text += "Software Version: " + RefDAEZA[3].Substring(0, 2) + "." + RefDAEZA[3].Substring(2, 2) + Environment.NewLine;
+            richTextBoxLog.Text += "Calibration Version: " + RefDAEZI[1] + Environment.NewLine;
+            richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWDAE.Text) + Environment.NewLine;
+            richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefDAEZI[2].Substring(0, 2)) + "." + string.Format(RefDAEZI[2].Substring(2, 2)) + Environment.NewLine;
+            richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefDAEZI[4]) + Environment.NewLine;
+            richTextBoxLog.Text += "Teletransmission date: " + Convert.ToInt32(RefDAEZI[3].Substring(0, 2), 16) + "." + Convert.ToInt32(RefDAEZI[3].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefDAEZI[3].Substring(4, 2), 16) + Environment.NewLine;
+            //richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
+            richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefDAEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefDAEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefDAEZI[0].Substring(4, 2), 16);*/
             /*//ConnectModuleUDS(BSI);
-            string str = "34A00000000605" + textBoxNewCodingDAE.Text + "FD000000";
-            byte[] BTS = StringToByteArray(str);
-            ushort calc_crc = Crc16_x25(BTS, BTS.Length);
+        string str = "34A00000000605" + textBoxNewCodingDAE.Text + "FD000000";
+        byte[] BTS = StringToByteArray(str);
+        ushort calc_crc = Crc16_x25(BTS, BTS.Length);
 
-            calc_crc = (ushort)ROL(calc_crc, 8);
+        calc_crc = (ushort)ROL(calc_crc, 8);
 
-            richTextBoxLog.Text += $"CRC16-x25 : {calc_crc.ToString("X")}" + Environment.NewLine;
-            string CodingMessage = str + calc_crc.ToString("X");
-            richTextBoxLog.Text += CodingMessage + Environment.NewLine;
-            //           string Key = textBoxKey.Text;
-            //           string Seed = textBoxSeed.Text;
-            //           string SeedKey = GetKey(Seed, Key);
-            //           richTextBoxLog.Text += DateTime.Now.ToString() +" " + SeedKey + Environment.NewLine;*/
+        richTextBoxLog.Text += $"CRC16-x25 : {calc_crc.ToString("X")}" + Environment.NewLine;
+        string CodingMessage = str + calc_crc.ToString("X");
+        richTextBoxLog.Text += CodingMessage + Environment.NewLine;
+        //           string Key = textBoxKey.Text;
+        //           string Seed = textBoxSeed.Text;
+        //           string SeedKey = GetKey(Seed, Key);
+        //           richTextBoxLog.Text += DateTime.Now.ToString() +" " + SeedKey + Environment.NewLine;*/
         }
         private void ButtonSaveLog_Click(object sender, EventArgs e)
         {
@@ -1573,7 +1827,7 @@ namespace PSA_CVM2
             {
                 if (!Directory.Exists(@"Logs"))
                 { Directory.CreateDirectory("Logs"); }
-                string path = @"Logs\Log-" + textBoxVin.Text + ".txt";
+                string path = @"Logs\Log-" + textBoxVin.Text + "-" + textBoxmileage.Text + ".txt";
                 if (!File.Exists(path))
                 {
                     using (StreamWriter sw = File.CreateText(path))
@@ -1623,6 +1877,29 @@ namespace PSA_CVM2
                     }
                 }
             }
+        }
+        private void ButtonReadFaults_Click(object sender, EventArgs e)
+        {
+            spArduino.WriteLine("190209");
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > 120209" + Environment.NewLine;
+            Thread.Sleep(500);
+            string odpowiedz = serialData;
+            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odpowiedz + Environment.NewLine;
+            richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+        }
+        private void ButtonClearFaults_Click(object sender, EventArgs e)
+        {
+            ClearFaults();
+        }
+        private void ClearFaults()
+        {
+            spArduino.WriteLine("14FFFFFF");
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > 14FFFFFF" + Environment.NewLine;
+            Thread.Sleep(500);
+            string odpowiedz = serialData;
+            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odpowiedz + Environment.NewLine;
+            richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+
         }
     }
 }
