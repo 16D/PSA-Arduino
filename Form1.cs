@@ -339,6 +339,22 @@ namespace PSA_CVM2
             string odpowiedz = serialData;
             return odpowiedz;
         }
+        private string ConnectModuleKWPHAB(string type)
+        {
+            textBoxInfo.Clear();
+            spArduino.WriteLine(String.Format("1001"));
+            richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" > 1001") + Environment.NewLine;
+            Thread.Sleep(100);
+            spArduino.WriteLine(String.Format(type));
+            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " " + String.Format(type) + Environment.NewLine;
+            Thread.Sleep(100);
+            spArduino.WriteLine(String.Format("10C0"));
+            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" > 10C0") + Environment.NewLine;
+            Thread.Sleep(500);
+            string odpowiedz = serialData;
+            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + String.Format(odpowiedz) + Environment.NewLine;
+            return odpowiedz;
+        }
         private string ConnectModuleKWP(string type)
         {
             textBoxInfo.Clear(); 
@@ -845,7 +861,7 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("81"));
             richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" > 81") + Environment.NewLine;
             Thread.Sleep(500);
-            spArduino.WriteLine(String.Format(":2305:83:C0"));
+            spArduino.WriteLine(String.Format(":" + CodingKeyDAE + ":83:C0"));
             richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" > :2305:83:C0") + Environment.NewLine;
             string str = "34A00000000605" + textBoxNewCodingDAE.Text + "00000000";
             byte[] BTS = StringToByteArray(str);
@@ -1275,69 +1291,95 @@ namespace PSA_CVM2
         private void ButtonIdentifyTELEMAT_Click(object sender, EventArgs e)
         {
             richTextBoxLog.Text += Environment.NewLine + "Connecting to TELEMAT" + Environment.NewLine;
-            ConnectModuleUDS(TELEMAT);
-            string odebraneTELEMATZA = ReadZoneUDS("F080");
-            string odebraneTELEMATZI = ReadZoneUDS("F0FE");
-            string[] RefTELEMATZI = { odebraneTELEMATZI.Substring(18, 6), odebraneTELEMATZI.Substring(26, 2), odebraneTELEMATZI.Substring(28, 2), odebraneTELEMATZI.Substring(30, 2), odebraneTELEMATZI.Substring(32, 6), odebraneTELEMATZI.Substring(46, 2), odebraneTELEMATZI.Substring(48, 6) };
-            textBoxSWTELEMAT.Text = "96" + RefTELEMATZI[6] + "80";
-            textBoxHWTELEMAT.Text = odebraneTELEMATZA.Substring(20, 10);
-            int TD = Convert.ToInt32(RefTELEMATZI[4].Substring(0, 2), 16);
-            int TM = Convert.ToInt32(RefTELEMATZI[4].Substring(2, 2), 16);
-            int TY = Convert.ToInt32(RefTELEMATZI[4].Substring(4, 2), 16);
-            string TDstring = TD.ToString();
-            string TMstring = TM.ToString();
-            string TYstring = "20" + TY.ToString();
-            if (RefTELEMATZI[4].Substring(0, 2) == "FF")
+            string odpowiedz = ConnectModuleKWPHAB(TELEMAT);
+            if (odpowiedz.Substring(0, 4) == "50C0")
             {
-                TDstring = RefTELEMATZI[4].Substring(0, 2);
-                TMstring = RefTELEMATZI[4].Substring(2, 2);
-                TYstring = RefTELEMATZI[4].Substring(4, 2);
-            }
-            string typtelemat = odebraneTELEMATZI.Substring(14, 4);
-            textBoxTypTELEMAT.Text = typtelemat;
-            if (typtelemat == "0DF5")
-            {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
-                textBoxTypTELEMAT.Text = "NAC";
+                string odebraneTELEMATZA = ReadZoneKWP("80");
+                string odebraneTELEMATZI = ReadZoneKWP("FE");
+                string[] RefTELEMATZA = { odebraneTELEMATZA.Substring(4, 10), odebraneTELEMATZA.Substring(16, 2), odebraneTELEMATZA.Substring(18, 10), odebraneTELEMATZA.Substring(28, 4) };
+                string[] RefTELEMATZI = { odebraneTELEMATZI.Substring(16, 6), odebraneTELEMATZI.Substring(24, 2), odebraneTELEMATZI.Substring(26, 4), odebraneTELEMATZI.Substring(30, 6), odebraneTELEMATZI.Substring(44, 2), odebraneTELEMATZI.Substring(46, 6) };
+                textBoxSWTELEMAT.Text = "96" + RefTELEMATZI[5] + "80";
+                textBoxTypTELEMAT.Text = "RNEG";
                 richTextBoxLog.Text += Environment.NewLine + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Software Version: " + RefTELEMATZA[3].Substring(0, 2) + "." + RefTELEMATZA[3].Substring(2, 2) + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Version: " + RefTELEMATZI[1] + Environment.NewLine;
                 richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefTELEMATZI[2]) + "." + string.Format(RefTELEMATZI[3]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[5]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
-                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefTELEMATZI[2].Substring(0, 2)) + "." + string.Format(RefTELEMATZI[2].Substring(2, 2)) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[4]) + Environment.NewLine;
+                richTextBoxLog.Text += "Teletransmission date: " + Convert.ToInt32(RefTELEMATZI[3].Substring(0, 2), 16) + "." + Convert.ToInt32(RefTELEMATZI[3].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefTELEMATZI[3].Substring(4, 2), 16) + Environment.NewLine;
+                //richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
                 richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefTELEMATZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefTELEMATZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefTELEMATZI[0].Substring(4, 2), 16);
                 richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
-                CodingKeyTELEMAT = "D91C";
-                UnlockCodingTELEMAT();
-            }
-            else if (typtelemat == "03F5")
-            {
-                textBoxTypTELEMAT.Text = "RCC";
-                richTextBoxLog.Text += Environment.NewLine + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefTELEMATZI[1] + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefTELEMATZI[2]) + "." + string.Format(RefTELEMATZI[3]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[5]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
-                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefTELEMATZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefTELEMATZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefTELEMATZI[0].Substring(4, 2), 16);
-                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
-                CodingKeyTELEMAT = "F107";
+                CodingKeyTELEMAT = "ADDA";
                 UnlockCodingTELEMAT();
             }
             else
             {
-                textBoxTypTELEMAT.Text = "Unknown " + typtelemat;
-                richTextBoxLog.Text += Environment.NewLine + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Version: " + RefTELEMATZI[1] + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefTELEMATZI[2]) + "." + string.Format(RefTELEMATZI[3]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[5]) + Environment.NewLine;
-                richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
-                richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
-                richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefTELEMATZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefTELEMATZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefTELEMATZI[0].Substring(4, 2), 16);
-                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
-                UnlockCodingTELEMAT();
+                odpowiedz = ConnectModuleUDS(TELEMAT);
+                richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + String.Format(odpowiedz) + Environment.NewLine;
+                string odebraneTELEMATZA = ReadZoneUDS("F080");
+                string odebraneTELEMATZI = ReadZoneUDS("F0FE");
+                string[] RefTELEMATZI = { odebraneTELEMATZI.Substring(18, 6), odebraneTELEMATZI.Substring(26, 2), odebraneTELEMATZI.Substring(28, 2), odebraneTELEMATZI.Substring(30, 2), odebraneTELEMATZI.Substring(32, 6), odebraneTELEMATZI.Substring(46, 2), odebraneTELEMATZI.Substring(48, 6) };
+                textBoxSWTELEMAT.Text = "96" + RefTELEMATZI[6] + "80";
+                textBoxHWTELEMAT.Text = odebraneTELEMATZA.Substring(20, 10);
+                int TD = Convert.ToInt32(RefTELEMATZI[4].Substring(0, 2), 16);
+                int TM = Convert.ToInt32(RefTELEMATZI[4].Substring(2, 2), 16);
+                int TY = Convert.ToInt32(RefTELEMATZI[4].Substring(4, 2), 16);
+                string TDstring = TD.ToString();
+                string TMstring = TM.ToString();
+                string TYstring = "20" + TY.ToString();
+                if (RefTELEMATZI[4].Substring(0, 2) == "FF")
+                {
+                    TDstring = RefTELEMATZI[4].Substring(0, 2);
+                    TMstring = RefTELEMATZI[4].Substring(2, 2);
+                    TYstring = RefTELEMATZI[4].Substring(4, 2);
+                }
+                string typtelemat = odebraneTELEMATZI.Substring(14, 4);
+                textBoxTypTELEMAT.Text = typtelemat;
+                if (typtelemat == "0DF5")
+                {                                                                                       // warunek przypisania typu BSI do kodu Bajtowego
+                    textBoxTypTELEMAT.Text = "NAC";
+                    richTextBoxLog.Text += Environment.NewLine + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefTELEMATZI[1] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefTELEMATZI[2]) + "." + string.Format(RefTELEMATZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefTELEMATZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefTELEMATZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefTELEMATZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                    CodingKeyTELEMAT = "D91C";
+                    UnlockCodingTELEMAT();
+                }
+                else if (typtelemat == "03F5")
+                {
+                    textBoxTypTELEMAT.Text = "RCC";
+                    richTextBoxLog.Text += Environment.NewLine + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefTELEMATZI[1] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefTELEMATZI[2]) + "." + string.Format(RefTELEMATZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefTELEMATZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefTELEMATZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefTELEMATZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                    CodingKeyTELEMAT = "F107";
+                    UnlockCodingTELEMAT();
+                }
+                else
+                {
+                    textBoxTypTELEMAT.Text = "Unknown " + typtelemat;
+                    richTextBoxLog.Text += Environment.NewLine + "TELEMAT: " + string.Format(textBoxTypTELEMAT.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefTELEMATZI[1] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWTELEMAT.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefTELEMATZI[2]) + "." + string.Format(RefTELEMATZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefTELEMATZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWTELEMAT.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefTELEMATZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefTELEMATZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefTELEMATZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                    UnlockCodingTELEMAT();
+                }
             }
         }
         private void ButtonReadZoneTELEMAT_Click(object sender, EventArgs e)
