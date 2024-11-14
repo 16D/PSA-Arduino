@@ -591,6 +591,7 @@ namespace PSA_CVM2
                     richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
                     richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefCVMZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefCVMZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefCVMZI[0].Substring(4, 2), 16);
                     richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                    CodingKeyCVM = "E2E5";
                     UnlockCodingCVM();
                 }
                 else
@@ -665,6 +666,7 @@ namespace PSA_CVM2
                         string odebrane3 = serialData;
                         richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane3 + Environment.NewLine;
                         //wyslac ramke 2E2901FD000000010101 aby nie bylo bledu B1003 zabezpieczonego kodowania
+                        Thread.Sleep(200); 
                         spArduino.WriteLine("2E2901FD000000010101");
                         richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > 2E290100000000010101" + Environment.NewLine;
                         Thread.Sleep(100);
@@ -794,6 +796,20 @@ namespace PSA_CVM2
                     richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
                     UnlockCodingDAE();
                 }
+                else if (typdae == "215D")
+                {
+                    textBoxTypDAE.Text = "DAE_UDS";
+                    richTextBoxLog.Text += Environment.NewLine + "DAE: " + string.Format(textBoxTypDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Version: " + RefDAEZI[1] + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Reference: " + string.Format(textBoxSWDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Calibration Edition(Hex): " + string.Format(RefDAEZI[2]) + "." + string.Format(RefDAEZI[3]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission Counter:" + string.Format(RefDAEZI[5]) + Environment.NewLine;
+                    richTextBoxLog.Text += "Teletransmission date: " + string.Format(TDstring) + "." + string.Format(TMstring) + "." + string.Format(TYstring) + Environment.NewLine;
+                    richTextBoxLog.Text += "Hardware Number: " + string.Format(textBoxHWDAE.Text) + Environment.NewLine;
+                    richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefDAEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefDAEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefDAEZI[0].Substring(4, 2), 16);
+                    richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+                    UnlockCodingDAE();
+                }
                 else
                 {
                     textBoxTypDAE.Text = "Unknown " + typdae;
@@ -817,6 +833,15 @@ namespace PSA_CVM2
             {
                 string odebrane = ReadZoneKWP("A0");
                 string toRemove4 = String.Format("61A0");
+                int s2 = odebrane.IndexOf(toRemove4);                                          // Zapis string.Empty lub string = ""; to to samo
+                string CodingDAE = odebrane.Remove(s2, toRemove4.Length);
+                textBoxDAECoding.Text = CodingDAE;
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+            }
+            else if (textBoxTypDAE.Text == "DAE_UDS")
+            {
+                string odebrane = ReadZoneUDS("2101");
+                string toRemove4 = String.Format("622101");
                 int s2 = odebrane.IndexOf(toRemove4);                                          // Zapis string.Empty lub string = ""; to to samo
                 string CodingDAE = odebrane.Remove(s2, toRemove4.Length);
                 textBoxDAECoding.Text = CodingDAE;
@@ -973,15 +998,7 @@ namespace PSA_CVM2
         }
         private void ButtonReadCodingAAS_Click(object sender, EventArgs e)
         {
-            if (textBoxTypAAS.Text == "AAS_UDS_G5")
-            {
-                string odebraneCodingAAS = ReadZoneUDS("2100");
-                string toRemove3 = String.Format("622100");
-                int s2 = odebraneCodingAAS.IndexOf(toRemove3);
-                string resultAASCoding = odebraneCodingAAS.Remove(s2, toRemove3.Length);
-                textBoxAASCoding.Text = resultAASCoding;
-            }
-            else if (textBoxTypAAS.Text == "CPK_UDS_G5")
+            if (textBoxTypAAS.Text == "CPK_UDS_G5")
             {
                 string odebraneCodingAAS = ReadZoneUDS("2101");
                 string toRemove3 = String.Format("622101");
@@ -996,6 +1013,12 @@ namespace PSA_CVM2
                 int s2 = odebraneCodingAAS.IndexOf(toRemove3);
                 string resultAASCoding = odebraneCodingAAS.Remove(s2, toRemove3.Length);
                 textBoxAASCoding.Text = resultAASCoding;
+            }
+            else
+            {
+                textBoxInfo.Text = "Select zone";
+                richTextBoxLog.Text += Environment.NewLine + "Select zone" + Environment.NewLine;
+                richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
             }
         }
         private void ButtonWriteCodingAAS_Click(object sender, EventArgs e)

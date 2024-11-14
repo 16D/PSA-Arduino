@@ -75,6 +75,7 @@ namespace PSA_CVM2
             this.textBoxTypBSI = new System.Windows.Forms.TextBox();
             this.buttonIdentifyBSI = new System.Windows.Forms.Button();
             this.tabCVM = new System.Windows.Forms.TabPage();
+            this.label63 = new System.Windows.Forms.Label();
             this.label48 = new System.Windows.Forms.Label();
             this.label35 = new System.Windows.Forms.Label();
             this.label36 = new System.Windows.Forms.Label();
@@ -222,7 +223,6 @@ namespace PSA_CVM2
             this.textBoxSWBVA = new System.Windows.Forms.TextBox();
             this.textBoxTypBVA = new System.Windows.Forms.TextBox();
             this.buttonIdentifyBVA = new System.Windows.Forms.Button();
-            this.label63 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.tabTELEMAT.SuspendLayout();
             this.tabBSI.SuspendLayout();
@@ -682,6 +682,15 @@ namespace PSA_CVM2
             this.tabCVM.TabIndex = 2;
             this.tabCVM.Text = "CVM";
             this.tabCVM.UseVisualStyleBackColor = true;
+            // 
+            // label63
+            // 
+            this.label63.AutoSize = true;
+            this.label63.Location = new System.Drawing.Point(31, 132);
+            this.label63.Name = "label63";
+            this.label63.Size = new System.Drawing.Size(83, 16);
+            this.label63.TabIndex = 64;
+            this.label63.Text = "Actual value:";
             // 
             // label48
             // 
@@ -2088,15 +2097,6 @@ namespace PSA_CVM2
             this.buttonIdentifyBVA.UseVisualStyleBackColor = true;
             this.buttonIdentifyBVA.Click += new System.EventHandler(this.ButtonIdentifyBVA_Click);
             // 
-            // label63
-            // 
-            this.label63.AutoSize = true;
-            this.label63.Location = new System.Drawing.Point(31, 132);
-            this.label63.Name = "label63";
-            this.label63.Size = new System.Drawing.Size(83, 16);
-            this.label63.TabIndex = 64;
-            this.label63.Text = "Actual value:";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -2106,7 +2106,7 @@ namespace PSA_CVM2
             this.Controls.Add(this.textBoxInfo);
             this.Controls.Add(this.panel1);
             this.Name = "Form1";
-            this.Text = "PSA Arduino 06.10.2024";
+            this.Text = "PSA Arduino 07.11.2024";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.tabTELEMAT.ResumeLayout(false);
@@ -2298,7 +2298,6 @@ namespace PSA_CVM2
         private System.Windows.Forms.TextBox textBoxZoneDAE;
         private System.Windows.Forms.TextBox textBoxZoneValueDAE;
         private System.Windows.Forms.Button buttonReadZoneDAE;
-        private System.Windows.Forms.Button buttonWriteZoneBSI;
         private System.Windows.Forms.TabPage tabBVA;
         private System.Windows.Forms.Label label54;
         private System.Windows.Forms.TextBox textBox2;
@@ -2326,6 +2325,7 @@ namespace PSA_CVM2
         private System.Windows.Forms.Button button11;
         private System.Windows.Forms.Button button10;
         private System.Windows.Forms.Label label63;
+        private System.Windows.Forms.Button buttonWriteZoneBSI;
     }
 }
 
