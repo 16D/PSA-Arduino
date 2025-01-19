@@ -44,6 +44,8 @@ namespace PSA_CVM2
         public string CodingKeyINJ;
         public string BVA = ">6A9:689";
         public string CodingKeyBVA;
+        public string ABRASR = ">6AD:68D";
+        public string CodingKeyABRASR;
         private string zone;
         public Form1()
         {
@@ -303,10 +305,12 @@ namespace PSA_CVM2
         private void UnlockCodingTELEMAT()
         {
             buttonReadZoneTELEMAT.Enabled = true;
+            buttonWriteCodingTELEMAT.Enabled = true;
         }
         private void LockCodingTELEMAT()
         {
             buttonReadZoneTELEMAT.Enabled = false;
+            buttonWriteCodingTELEMAT.Enabled = false;
         }
         private void UnlockCodingINJ()
         {
@@ -886,17 +890,25 @@ namespace PSA_CVM2
             spArduino.WriteLine(String.Format("81"));
             richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" > 81") + Environment.NewLine;
             Thread.Sleep(500);
+            string odebrane = serialData;
+            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane + Environment.NewLine;
             spArduino.WriteLine(String.Format(":" + CodingKeyDAE + ":83:C0"));
-            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" > :2305:83:C0") + Environment.NewLine;
-            string str = "34A00000000605" + textBoxNewCodingDAE.Text + "00000000";
+            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" >:" + CodingKeyDAE + ":83:C0") + Environment.NewLine;
+            Thread.Sleep(500); 
+            string odebrane1 = serialData;
+            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane1 + Environment.NewLine;
+            string str = "34A00000000605" + textBoxNewCodingDAE.Text + "FD000000";
             byte[] BTS = StringToByteArray(str);
             ushort calc_crc = Crc16_x25(BTS, BTS.Length);
             calc_crc = (ushort)ROL(calc_crc, 8);
             richTextBoxLog.Text += $"CRC16-x25 : {calc_crc.ToString("X")}" + Environment.NewLine;
             string CodingMessage = str + calc_crc.ToString("X");
             spArduino.WriteLine(String.Format(CodingMessage));
+            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" > ") + CodingMessage + Environment.NewLine;
             Thread.Sleep(500);
-            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + String.Format(" > ") + CodingMessage + Environment.NewLine;       
+            string odebrane2 = serialData;
+            richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane2 + Environment.NewLine;
+
         }
         public void ButtonIdentifyAAS_Click(object sender, EventArgs e)
         {
@@ -1432,6 +1444,46 @@ namespace PSA_CVM2
                 textBoxInfo.Text = "Please select zone";
             }
         }
+        private void buttonWriteCodingTELEMAT_Click(object sender, EventArgs e)
+        {
+            if (textBoxZoneNewValueTELEMAT.Text == "")
+            {
+                textBoxInfo.Text = "New coding not written";
+            }
+            else if (textBoxZoneValueTELEMAT.Text == textBoxZoneNewValueTELEMAT.Text)
+            {
+                textBoxInfo.Text = "Coding wasn't changed";
+            }
+            else if (textBoxZoneValueTELEMAT.Text != textBoxZoneNewValueTELEMAT.Text)
+            {
+                spArduino.WriteLine(":" + CodingKeyTELEMAT + ":03:03");
+                Thread.Sleep(100);
+                string odebrane = serialData;
+                richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane + Environment.NewLine;
+                if (odebrane.Substring(0, 4) == "6704")
+                {
+                    string command = "2E" + textBoxZoneTELEMAT.Text + textBoxZoneNewValueTELEMAT.Text;
+                    spArduino.WriteLine(String.Format(command));
+                    richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > " + String.Format(command) + Environment.NewLine;
+                    Thread.Sleep(100);
+                    string odebrane3 = serialData;
+                    richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane3 + Environment.NewLine;
+                    //wyslac ramke 2E2901FD000000010101 aby nie bylo bledu B1003 zabezpieczonego kodowania
+                    spArduino.WriteLine("2E2901FD000000010101");
+                    richTextBoxLog.Text += Environment.NewLine + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > 2E290100000000010101" + Environment.NewLine;
+                    Thread.Sleep(100);
+                    string odebrane4 = serialData;
+                    richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " < " + odebrane4 + Environment.NewLine;
+                    spArduino.WriteLine("1103");
+                    richTextBoxLog.Text += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff") + " > 1103" + Environment.NewLine;
+
+                }
+                else
+                {
+                    textBoxInfo.Text = "Coding conditions not met";
+                }
+            }
+        }
         private void ButtonIdentifyINJ_Click(object sender, EventArgs e)
         {
             richTextBoxLog.Text += Environment.NewLine + "Connecting to INJ" + Environment.NewLine;
@@ -1848,13 +1900,13 @@ namespace PSA_CVM2
         }
         public void ButtonAlgo_Click(object sender, EventArgs e)
         {
-            string mileage = "000EFDA2";
+            /*string mileage = "000EFDA2";
             richTextBoxLog.Text += "Input value mileage: " + string.Format(mileage) + Environment.NewLine;
             richTextBoxLog.Text += "Mileage: " + Convert.ToInt32(mileage, 16)/10 + " km" + Environment.NewLine;
             textBoxmileage.Text = Convert.ToInt32(mileage, 16) / 10 + " km";
             richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
 
-            /*string odebraneDAEZA = "6180982707648000219829982180D020FFFF0101FFFFFFFF";
+            string odebraneDAEZA = "6180982707648000219829982180D020FFFF0101FFFFFFFF";
             string odebraneDAEZI = "61FE00000000215C1D06100510FF01000000FE02000001933887";
             string[] RefDAEZA = { odebraneDAEZA.Substring(4, 10), odebraneDAEZA.Substring(16, 2), odebraneDAEZA.Substring(18, 10), odebraneDAEZA.Substring(28, 4) };
             string[] RefDAEZI = { odebraneDAEZI.Substring(16, 6), odebraneDAEZI.Substring(24, 2), odebraneDAEZI.Substring(26, 4), odebraneDAEZI.Substring(30, 6), odebraneDAEZI.Substring(44, 2), odebraneDAEZI.Substring(46, 6) };
@@ -1869,7 +1921,7 @@ namespace PSA_CVM2
             richTextBoxLog.Text += "Teletransmission date: " + Convert.ToInt32(RefDAEZI[3].Substring(0, 2), 16) + "." + Convert.ToInt32(RefDAEZI[3].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefDAEZI[3].Substring(4, 2), 16) + Environment.NewLine;
             //richTextBoxLog.Text += "HW: " + string.Format(textBoxHWCVM.Text) + Environment.NewLine;
             richTextBoxLog.Text += "Production date: " + Convert.ToInt32(RefDAEZI[0].Substring(0, 2), 16) + "." + Convert.ToInt32(RefDAEZI[0].Substring(2, 2), 16) + ".20" + Convert.ToInt32(RefDAEZI[0].Substring(4, 2), 16);*/
-            /*//ConnectModuleUDS(BSI);
+            //ConnectModuleUDS(BSI);
         string str = "34A00000000605" + textBoxNewCodingDAE.Text + "FD000000";
         byte[] BTS = StringToByteArray(str);
         ushort calc_crc = Crc16_x25(BTS, BTS.Length);
